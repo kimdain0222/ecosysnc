@@ -75,6 +75,10 @@ models/*.pkl
 *.tmp
 *.temp
 
+# Auto-generated files by GitHub Actions
+daily_activity.log
+weekly_summary.md
+
 # Node modules (if any frontend dependencies)
 node_modules/
 npm-debug.log*

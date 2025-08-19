@@ -1,0 +1,61 @@
+name: Daily Commit
+
+on:
+  schedule:
+    # 매일 한국 시간 오전 9시에 실행 (UTC 0시)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 수동으로도 실행 가능
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Create daily commit
+        run: |
+          # 현재 날짜와 시간
+          echo "Daily commit: $(date '+%Y-%m-%d %H:%M:%S KST')" >> daily_activity.log
+          
+          # 랜덤한 활동 메시지 생성
+          activities=(
+            "코드 리뷰 및 개선"
+            "문서 업데이트"
+            "버그 수정"
+            "성능 최적화"
+            "테스트 코드 작성"
+            "README 업데이트"
+            "코드 정리"
+            "주석 추가"
+            "로깅 개선"
+            "에러 처리 개선"
+          )
+          
+          # 랜덤하게 활동 선택
+          random_activity=${activities[$RANDOM % ${#activities[@]}]}
+          
+          # 커밋 메시지 생성
+          commit_message="🌱 Daily activity: $random_activity - $(date '+%Y-%m-%d')"
+          
+          echo "$commit_message" >> daily_activity.log
+          
+          # 파일 추가 및 커밋
+          git add daily_activity.log
+          git commit -m "$commit_message"
+          
+          # 푸시
+          git push
+
+      - name: Show commit info
+        run: |
+          echo "✅ Daily commit completed!"
+          echo "📅 Date: $(date)"
+          echo "🌱 Activity log updated"

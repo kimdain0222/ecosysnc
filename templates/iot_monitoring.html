@@ -1,0 +1,595 @@
+{% extends "base.html" %}
+
+{% block title %}IoT 센서 모니터링 - 스마트 빌딩 에너지 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 페이지 헤더 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-sensor text-primary"></i>
+                        IoT 센서 모니터링
+                    </h1>
+                    <p class="text-muted mb-0">실시간 센서 데이터 모니터링 및 상태 관리</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> 새로고침
+                    </button>
+                    <button class="btn btn-success" onclick="startSimulation()">
+                        <i class="fas fa-play"></i> 시뮬레이션 시작
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 센서 상태 카드 -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                온라인 센서
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="online-sensors">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-wifi fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                총 센서 수
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-sensors">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-sensor fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                활성 알림
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="active-alerts">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                마지막 업데이트
+                            </div>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800" id="last-update">-</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 센서 데이터 차트 -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">실시간 센서 데이터</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">센서 타입:</div>
+                            <a class="dropdown-item" href="#" onclick="updateChart('temperature')">온도</a>
+                            <a class="dropdown-item" href="#" onclick="updateChart('humidity')">습도</a>
+                            <a class="dropdown-item" href="#" onclick="updateChart('occupancy')">인원</a>
+                            <a class="dropdown-item" href="#" onclick="updateChart('power')">전력</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="sensorChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">센서 상태</h6>
+                </div>
+                <div class="card-body">
+                    <div id="sensor-status-list">
+                        <!-- 센서 상태가 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 센서 목록 및 알림 -->
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">센서 목록</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="sensors-table" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>센서 ID</th>
+                                    <th>이름</th>
+                                    <th>타입</th>
+                                    <th>위치</th>
+                                    <th>상태</th>
+                                    <th>최신 값</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sensors-table-body">
+                                <!-- 센서 목록이 여기에 동적으로 로드됩니다 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">최근 알림</h6>
+                </div>
+                <div class="card-body">
+                    <div id="alerts-list">
+                        <!-- 알림 목록이 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 센서 상세 정보 모달 -->
+<div class="modal fade" id="sensorDetailModal" tabindex="-1" role="dialog" aria-labelledby="sensorDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sensorDetailModalLabel">센서 상세 정보</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="sensor-detail-content">
+                <!-- 센서 상세 정보가 여기에 로드됩니다 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let sensorChart;
+let currentSensorType = 'temperature';
+let refreshInterval;
+
+// 페이지 로드 시 초기화
+$(document).ready(function() {
+    initializeChart();
+    loadDashboardData();
+    
+    // 30초마다 데이터 새로고침
+    refreshInterval = setInterval(loadDashboardData, 30000);
+});
+
+// 차트 초기화
+function initializeChart() {
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: '센서 값',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+}
+
+// 대시보드 데이터 로드
+function loadDashboardData() {
+    $.ajax({
+        url: '/api/iot/dashboard',
+        method: 'GET',
+        success: function(data) {
+            updateDashboardStats(data);
+            updateSensorStatus(data.sensor_status);
+            updateSensorsTable(data.recent_readings);
+            updateAlertsList(data.alerts);
+            updateChart(currentSensorType);
+        },
+        error: function(xhr, status, error) {
+            console.error('대시보드 데이터 로드 오류:', error);
+            showAlert('대시보드 데이터를 로드할 수 없습니다.', 'danger');
+        }
+    });
+}
+
+// 대시보드 통계 업데이트
+function updateDashboardStats(data) {
+    $('#online-sensors').text(data.online_sensors);
+    $('#total-sensors').text(data.total_sensors);
+    $('#active-alerts').text(data.active_alerts);
+    $('#last-update').text(new Date().toLocaleTimeString());
+}
+
+// 센서 상태 업데이트
+function updateSensorStatus(sensorStatus) {
+    const statusList = $('#sensor-status-list');
+    statusList.empty();
+    
+    sensorStatus.forEach(sensor => {
+        const statusClass = sensor.status === 'online' ? 'success' : 'danger';
+        const statusIcon = sensor.status === 'online' ? 'fa-check-circle' : 'fa-times-circle';
+        
+        const statusHtml = `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <strong>${sensor.sensor_id}</strong>
+                    <br>
+                    <small class="text-muted">${sensor.sensor_type}</small>
+                </div>
+                <div class="text-right">
+                    <span class="badge badge-${statusClass}">
+                        <i class="fas ${statusIcon}"></i> ${sensor.status}
+                    </span>
+                    <br>
+                    <small class="text-muted">${sensor.last_reading || 'N/A'} ${getUnit(sensor.sensor_type)}</small>
+                </div>
+            </div>
+        `;
+        statusList.append(statusHtml);
+    });
+}
+
+// 센서 목록 테이블 업데이트
+function updateSensorsTable(readings) {
+    const tableBody = $('#sensors-table-body');
+    tableBody.empty();
+    
+    // 센서별 최신 데이터 그룹화
+    const latestReadings = {};
+    readings.forEach(reading => {
+        if (!latestReadings[reading.sensor_id] || 
+            new Date(reading.timestamp) > new Date(latestReadings[reading.sensor_id].timestamp)) {
+            latestReadings[reading.sensor_id] = reading;
+        }
+    });
+    
+    Object.values(latestReadings).forEach(reading => {
+        const row = `
+            <tr>
+                <td>${reading.sensor_id}</td>
+                <td>${getSensorName(reading.sensor_id)}</td>
+                <td>${reading.sensor_type}</td>
+                <td>${reading.building_id} ${reading.floor}층 ${reading.room_type}</td>
+                <td>
+                    <span class="badge badge-${reading.status === 'normal' ? 'success' : 'warning'}">
+                        ${reading.status}
+                    </span>
+                </td>
+                <td>
+                    ${reading.value} ${reading.unit}
+                    <button class="btn btn-sm btn-outline-primary ml-2" onclick="showSensorDetail('${reading.sensor_id}')">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.append(row);
+    });
+}
+
+// 알림 목록 업데이트
+function updateAlertsList(alerts) {
+    const alertsList = $('#alerts-list');
+    alertsList.empty();
+    
+    if (alerts.length === 0) {
+        alertsList.html('<p class="text-muted">활성 알림이 없습니다.</p>');
+        return;
+    }
+    
+    alerts.forEach(alert => {
+        const severityClass = alert.severity === 'critical' ? 'danger' : 'warning';
+        const alertHtml = `
+            <div class="alert alert-${severityClass} alert-dismissible fade show" role="alert">
+                <strong>${alert.alert_type}</strong><br>
+                ${alert.message}
+                <small class="d-block text-muted mt-1">
+                    ${new Date(alert.timestamp).toLocaleString()}
+                </small>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `;
+        alertsList.append(alertHtml);
+    });
+}
+
+// 차트 업데이트
+function updateChart(sensorType) {
+    currentSensorType = sensorType;
+    
+    $.ajax({
+        url: `/api/iot/readings?sensor_type=${sensorType}&hours=24`,
+        method: 'GET',
+        success: function(data) {
+            const readings = data.readings.reverse(); // 시간순 정렬
+            
+            const labels = readings.map(r => new Date(r.timestamp).toLocaleTimeString());
+            const values = readings.map(r => r.value);
+            
+            sensorChart.data.labels = labels;
+            sensorChart.data.datasets[0].data = values;
+            sensorChart.data.datasets[0].label = getSensorTypeLabel(sensorType);
+            sensorChart.data.datasets[0].borderColor = getSensorTypeColor(sensorType);
+            sensorChart.data.datasets[0].backgroundColor = getSensorTypeColor(sensorType, 0.2);
+            
+            sensorChart.update();
+        },
+        error: function(xhr, status, error) {
+            console.error('차트 데이터 로드 오류:', error);
+        }
+    });
+}
+
+// 센서 상세 정보 표시
+function showSensorDetail(sensorId) {
+    $.ajax({
+        url: `/api/iot/readings?sensor_id=${sensorId}&hours=24`,
+        method: 'GET',
+        success: function(data) {
+            const readings = data.readings;
+            if (readings.length === 0) {
+                showAlert('센서 데이터가 없습니다.', 'warning');
+                return;
+            }
+            
+            const latest = readings[0];
+            const detailHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>센서 정보</h6>
+                        <table class="table table-sm">
+                            <tr><td>센서 ID:</td><td>${latest.sensor_id}</td></tr>
+                            <tr><td>타입:</td><td>${latest.sensor_type}</td></tr>
+                            <tr><td>건물:</td><td>${latest.building_id}</td></tr>
+                            <tr><td>층:</td><td>${latest.floor}</td></tr>
+                            <tr><td>공간:</td><td>${latest.room_type}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>최신 데이터</h6>
+                        <table class="table table-sm">
+                            <tr><td>값:</td><td>${latest.value} ${latest.unit}</td></tr>
+                            <tr><td>상태:</td><td>${latest.status}</td></tr>
+                            <tr><td>신뢰도:</td><td>${(latest.confidence * 100).toFixed(1)}%</td></tr>
+                            <tr><td>시간:</td><td>${new Date(latest.timestamp).toLocaleString()}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>24시간 데이터 추이</h6>
+                        <canvas id="detailChart" width="100%" height="200"></canvas>
+                    </div>
+                </div>
+            `;
+            
+            $('#sensor-detail-content').html(detailHtml);
+            $('#sensorDetailModal').modal('show');
+            
+            // 상세 차트 생성
+            setTimeout(() => {
+                createDetailChart(readings);
+            }, 100);
+        },
+        error: function(xhr, status, error) {
+            console.error('센서 상세 정보 로드 오류:', error);
+            showAlert('센서 상세 정보를 로드할 수 없습니다.', 'danger');
+        }
+    });
+}
+
+// 상세 차트 생성
+function createDetailChart(readings) {
+    const ctx = document.getElementById('detailChart').getContext('2d');
+    const labels = readings.map(r => new Date(r.timestamp).toLocaleTimeString());
+    const values = readings.map(r => r.value);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '센서 값',
+                data: values,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// 유틸리티 함수들
+function getUnit(sensorType) {
+    const units = {
+        'temperature': '°C',
+        'humidity': '%',
+        'occupancy': '명',
+        'power': 'kWh'
+    };
+    return units[sensorType] || '';
+}
+
+function getSensorName(sensorId) {
+    // 실제로는 설정에서 센서 이름을 가져와야 함
+    return sensorId.replace('_', ' ').toUpperCase();
+}
+
+function getSensorTypeLabel(sensorType) {
+    const labels = {
+        'temperature': '온도 (°C)',
+        'humidity': '습도 (%)',
+        'occupancy': '인원 (명)',
+        'power': '전력 (kWh)'
+    };
+    return labels[sensorType] || sensorType;
+}
+
+function getSensorTypeColor(sensorType, alpha = 1) {
+    const colors = {
+        'temperature': `rgba(255, 99, 132, ${alpha})`,
+        'humidity': `rgba(54, 162, 235, ${alpha})`,
+        'occupancy': `rgba(255, 205, 86, ${alpha})`,
+        'power': `rgba(75, 192, 192, ${alpha})`
+    };
+    return colors[sensorType] || `rgba(128, 128, 128, ${alpha})`;
+}
+
+// 전력 사용량 색상 기준 함수
+function getPowerColor(power) {
+    if (power <= 10) {
+        return 'text-primary'; // 파란색 (낮음)
+    } else if (power <= 30) {
+        return 'text-success'; // 초록색 (매우 낮음)
+    } else if (power <= 60) {
+        return 'text-warning'; // 노란색 (보통)
+    } else {
+        return 'text-danger'; // 빨간색 (높음/매우 높음)
+    }
+}
+
+function getPowerStatus(power) {
+    if (power <= 10) {
+        return '매우 낮음';
+    } else if (power <= 30) {
+        return '낮음';
+    } else if (power <= 60) {
+        return '보통';
+    } else {
+        return power > 100 ? '매우 높음' : '높음';
+    }
+}
+
+// 새로고침 함수
+function refreshData() {
+    loadDashboardData();
+    showAlert('데이터가 새로고침되었습니다.', 'success');
+}
+
+// 시뮬레이션 시작
+function startSimulation() {
+    showAlert('시뮬레이션을 시작하려면 별도의 터미널에서 sensor_simulator.py를 실행하세요.', 'info');
+}
+
+// 알림 표시
+function showAlert(message, type) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `;
+    
+    // 기존 알림 제거
+    $('.alert').remove();
+    
+    // 새 알림 추가
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3초 후 자동 제거
+    setTimeout(() => {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+
+// 페이지 언로드 시 인터벌 정리
+$(window).on('beforeunload', function() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+});
+</script>
+{% endblock %}

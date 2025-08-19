@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}데이터 분석 - 스마트 빌딩 에너지 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-chart-bar text-primary me-2"></i>
+                데이터 분석
+            </h1>
+            <p class="text-muted">모델 성능과 특성 중요도를 분석해보세요</p>
+        </div>
+    </div>
+
+    <!-- Model Performance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-trophy text-warning me-2"></i>
+                        모델 성능 비교
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>모델</th>
+                                            <th>R² Score</th>
+                                            <th>RMSE</th>
+                                            <th>MAPE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="performance-table">
+                                        <!-- 데이터가 JavaScript로 동적 로드됨 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Importance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-brain text-success me-2"></i>
+                        특성 중요도 분석
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="chart-container">
+                                <canvas id="importanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <h6>상위 10개 중요 특성</h6>
+                            <div id="top-features" class="list-group list-group-flush">
+                                <!-- 특성 목록이 JavaScript로 동적 로드됨 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analysis -->
+    <div class="row">
+        <!-- R² Score Analysis -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-percentage text-primary me-2"></i>
+                        R² Score 분석
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="r2Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RMSE Analysis -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-line text-warning me-2"></i>
+                        RMSE 분석
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="rmseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAPE Analysis -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-percentage text-danger me-2"></i>
+                        MAPE 분석
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="mapeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Insights -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-lightbulb text-info me-2"></i>
+                        모델 인사이트
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>🏆 최고 성능 모델</h6>
+                            <div class="alert alert-success">
+                                <strong>Random Forest</strong>가 가장 높은 성능을 보여줍니다.
+                                <ul class="mb-0 mt-2">
+                                    <li>R² Score: 0.9626 (96.26%)</li>
+                                    <li>RMSE: 4.22 kWh</li>
+                                    <li>MAPE: 3.19%</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>🔍 주요 발견사항</h6>
+                            <div class="alert alert-info">
+                                <ul class="mb-0">
+                                    <li>건물 효율성과 전력 사용량의 상호작용이 가장 중요한 특성</li>
+                                    <li>시간대별 패턴이 전력 사용량에 큰 영향을 미침</li>
+                                    <li>공실률과 온도의 조합이 예측 정확도 향상에 기여</li>
+                                    <li>앙상블 모델들이 단일 모델보다 우수한 성능</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let performanceChart, importanceChart, r2Chart, rmseChart, mapeChart;
+
+$(document).ready(function() {
+    loadAnalyticsData();
+});
+
+function loadAnalyticsData() {
+    console.log('분석 데이터 로드 시작...');
+    
+    // 모델 성능 데이터 로드
+    $.ajax({
+        url: '/api/performance',
+        method: 'GET',
+        success: function(data) {
+            console.log('성능 데이터 로드 성공:', data);
+            createPerformanceCharts(data);
+            updatePerformanceTable(data);
+        },
+        error: function(xhr, status, error) {
+            console.error('성능 데이터 로드 실패:', error);
+            console.error('상태:', status);
+            console.error('응답:', xhr.responseText);
+            showErrorMessage('모델 성능 데이터를 로드할 수 없습니다.');
+        }
+    });
+
+    // 특성 중요도 데이터 로드
+    $.ajax({
+        url: '/api/importance',
+        method: 'GET',
+        success: function(data) {
+            console.log('특성 중요도 데이터 로드 성공:', data);
+            createImportanceChart(data);
+            updateTopFeatures(data);
+        },
+        error: function(xhr, status, error) {
+            console.error('특성 중요도 데이터 로드 실패:', error);
+            console.error('상태:', status);
+            console.error('응답:', xhr.responseText);
+            showErrorMessage('특성 중요도 데이터를 로드할 수 없습니다.');
+        }
+    });
+}
+
+function showErrorMessage(message) {
+    // 에러 메시지를 화면에 표시
+    const errorHtml = `
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    $('.container-fluid').prepend(errorHtml);
+}
+
+function createPerformanceCharts(data) {
+    try {
+        // 메인 성능 차트
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        performanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.models,
+            datasets: [{
+                label: 'R² Score',
+                data: data.r2_scores,
+                backgroundColor: '#3498db',
+                borderColor: '#2980b9',
+                borderWidth: 1
+            }, {
+                label: 'RMSE (정규화)',
+                data: data.rmse_scores.map(x => 1 - x/100), // 정규화
+                backgroundColor: '#e74c3c',
+                borderColor: '#c0392b',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+
+    // R² Score 차트
+    const r2Ctx = document.getElementById('r2Chart').getContext('2d');
+    r2Chart = new Chart(r2Ctx, {
+        type: 'doughnut',
+        data: {
+            labels: data.models,
+            datasets: [{
+                data: data.r2_scores,
+                backgroundColor: [
+                    '#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6',
+                    '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#16a085'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // RMSE 차트
+    const rmseCtx = document.getElementById('rmseChart').getContext('2d');
+    rmseChart = new Chart(rmseCtx, {
+        type: 'line',
+        data: {
+            labels: data.models,
+            datasets: [{
+                label: 'RMSE',
+                data: data.rmse_scores,
+                borderColor: '#e74c3c',
+                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // MAPE 차트
+    const mapeCtx = document.getElementById('mapeChart').getContext('2d');
+    mapeChart = new Chart(mapeCtx, {
+        type: 'bar',
+        data: {
+            labels: data.models,
+            datasets: [{
+                label: 'MAPE (%)',
+                data: data.mape_scores,
+                backgroundColor: '#f39c12',
+                borderColor: '#e67e22',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('성능 차트 생성 오류:', error);
+        showErrorMessage('차트를 생성할 수 없습니다: ' + error.message);
+    }
+}
+
+function updatePerformanceTable(data) {
+    const tableBody = $('#performance-table');
+    tableBody.empty();
+    
+    data.models.forEach((model, index) => {
+        const r2 = data.r2_scores[index];
+        const rmse = data.rmse_scores[index];
+        const mape = data.mape_scores[index];
+        
+        const tr = `
+            <tr>
+                <td><strong>${model}</strong></td>
+                <td>${r2.toFixed(4)}</td>
+                <td>${rmse.toFixed(2)}</td>
+                <td>${mape.toFixed(2)}%</td>
+            </tr>
+        `;
+        tableBody.append(tr);
+    });
+}
+
+function createImportanceChart(data) {
+    try {
+        const ctx = document.getElementById('importanceChart').getContext('2d');
+        importanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.features.slice(0, 15), // 상위 15개만 표시
+                datasets: [{
+                    label: '특성 중요도',
+                    data: data.importance.slice(0, 15),
+                    backgroundColor: '#2ecc71',
+                    borderColor: '#27ae60',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // 가로 막대 차트
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('특성 중요도 차트 생성 오류:', error);
+        showErrorMessage('특성 중요도 차트를 생성할 수 없습니다: ' + error.message);
+    }
+}
+
+function updateTopFeatures(data) {
+    const topFeaturesDiv = $('#top-features');
+    topFeaturesDiv.empty();
+    
+    data.features.slice(0, 10).forEach((feature, index) => {
+        const importance = data.importance[index];
+        const percentage = (importance * 100).toFixed(2);
+        
+        const item = `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${index + 1}.</strong> ${feature}
+                </div>
+                <span class="badge bg-primary rounded-pill">${percentage}%</span>
+            </div>
+        `;
+        topFeaturesDiv.append(item);
+    });
+}
+</script>
+{% endblock %}

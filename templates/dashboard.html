@@ -1,0 +1,762 @@
+{% extends "base.html" %}
+
+{% block title %}실시간 대시보드 - 스마트 빌딩 에너지 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-tachometer-alt text-primary me-2"></i>
+                    실시간 대시보드
+                </h1>
+                <div class="d-flex align-items-center">
+                    <span class="real-time-indicator"></span>
+                    <span class="text-muted">실시간 업데이트</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-building mb-2" style="font-size: 2rem;"></i>
+                    <h4 class="card-title" id="total-buildings">{{ stats.total_buildings }}</h4>
+                    <p class="card-text mb-0">관리 건물 수</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card success text-center">
+                <div class="card-body">
+                    <i class="fas fa-bolt mb-2" style="font-size: 2rem;"></i>
+                    <h4 class="card-title" id="current-power">{{ "%.1f"|format(stats.avg_power) }} kWh</h4>
+                    <p class="card-text mb-0">현재 전력 사용량 (kWh)</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card warning text-center">
+                <div class="card-body">
+                    <i class="fas fa-thermometer-half mb-2" style="font-size: 2rem;"></i>
+                    <h4 class="card-title" id="current-temp">--</h4>
+                    <p class="card-text mb-0">현재 온도 (°C)</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stat-card danger text-center">
+                <div class="card-body">
+                    <i class="fas fa-users mb-2" style="font-size: 2rem;"></i>
+                    <h4 class="card-title" id="current-occupancy">--</h4>
+                    <p class="card-text mb-0">현재 공실률 (%)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Building Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-building me-2"></i>
+                        건물별 실시간 현황
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- B001 - 본사 건물 -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="building-card" data-building="B001">
+                                <div class="building-header">
+                                    <h6 class="building-title">🏢 본사 건물</h6>
+                                    <span class="building-status success">정상</span>
+                                </div>
+                                <div class="building-floors">
+                                    <div class="floor-item" data-floor="1">
+                                        <span class="floor-name">1층 로비</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">22°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">45 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="2">
+                                        <span class="floor-name">2층 사무실</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">24°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">78 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="3">
+                                        <span class="floor-name">3층 회의실</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">23°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">35 kWh</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B002 - 연구소 -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="building-card" data-building="B002">
+                                <div class="building-header">
+                                    <h6 class="building-title">🔬 연구소</h6>
+                                    <span class="building-status success">정상</span>
+                                </div>
+                                <div class="building-floors">
+                                    <div class="floor-item" data-floor="1">
+                                        <span class="floor-name">1층 출입구</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">21°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">28 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="2">
+                                        <span class="floor-name">2층 실험실</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">22°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">65 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="3">
+                                        <span class="floor-name">3층 클린룸</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">20°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">42 kWh</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B003 - 생산공장 -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="building-card" data-building="B003">
+                                <div class="building-header">
+                                    <h6 class="building-title">🏭 생산공장</h6>
+                                    <span class="building-status warning">주의</span>
+                                </div>
+                                <div class="building-floors">
+                                    <div class="floor-item" data-floor="1">
+                                        <span class="floor-name">1층 창고</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">18°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">55 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="2">
+                                        <span class="floor-name">2층 생산라인</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">25°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">120 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="3">
+                                        <span class="floor-name">3층 품질관리</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">23°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">68 kWh</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B004 - 창고 -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="building-card" data-building="B004">
+                                <div class="building-header">
+                                    <h6 class="building-title">📦 창고</h6>
+                                    <span class="building-status success">정상</span>
+                                </div>
+                                <div class="building-floors">
+                                    <div class="floor-item" data-floor="1">
+                                        <span class="floor-name">1층 보관구역</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">16°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">25 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="2">
+                                        <span class="floor-name">2층 냉장보관</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">4°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">85 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="3">
+                                        <span class="floor-name">3층 하역장</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">15°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">40 kWh</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B005 - 사무실 -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="building-card" data-building="B005">
+                                <div class="building-header">
+                                    <h6 class="building-title">🏢 사무실</h6>
+                                    <span class="building-status success">정상</span>
+                                </div>
+                                <div class="building-floors">
+                                    <div class="floor-item" data-floor="1">
+                                        <span class="floor-name">1층 접수처</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">23°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">42 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="2">
+                                        <span class="floor-name">2층 오픈오피스</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">24°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-danger fw-bold">95 kWh</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="floor-item" data-floor="3">
+                                        <span class="floor-name">3층 회의실</span>
+                                        <div class="floor-stats">
+                                            <small class="text-muted">온도: <span class="temp-value">22°C</span></small>
+                                            <small class="text-muted">전력: <span class="power-value text-warning fw-bold">58 kWh</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Real-time Power Consumption -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        실시간 전력 사용량
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="powerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Environmental Data -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-leaf text-success me-2"></i>
+                        환경 데이터
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="envChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Charts -->
+    <div class="row mb-4">
+        <!-- Hourly Pattern -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock text-warning me-2"></i>
+                        시간대별 전력 사용 패턴
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-circle text-info me-1"></i>심야시간 (22-06시) |
+                            <i class="fas fa-circle text-success me-1"></i>출퇴근 시간대 (06-08시, 18-22시) |
+                            <i class="fas fa-circle text-warning me-1"></i>업무시간 (08-18시)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Building Comparison -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-building text-info me-2"></i>
+                        건물별 전력 사용량 비교
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="buildingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Data Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-table text-secondary me-2"></i>
+                        최근 데이터
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>시간</th>
+                                    <th>건물</th>
+                                    <th>전력 사용량 (kWh)</th>
+                                    <th>온도 (°C)</th>
+                                    <th>습도 (%)</th>
+                                    <th>공실률 (%)</th>
+                                    <th>상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table">
+                                <!-- 데이터가 JavaScript로 동적 로드됨 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let powerChart, envChart, hourlyChart, buildingChart;
+
+$(document).ready(function() {
+    initializeCharts();
+    loadRealTimeData();
+    
+    // 10초마다 실시간 데이터 업데이트
+    setInterval(loadRealTimeData, 10000);
+});
+
+function initializeCharts() {
+    // 실시간 전력 사용량 차트
+    const powerCtx = document.getElementById('powerChart').getContext('2d');
+    powerChart = new Chart(powerCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: '전력 사용량 (kWh)',
+                data: [],
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '전력 사용량 (kWh)'
+                    }
+                }
+            }
+        }
+    });
+
+    // 건물 카드 클릭 이벤트
+    document.querySelectorAll('.building-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const buildingId = this.getAttribute('data-building');
+            // 건물 클릭 시 상세 정보 모달 또는 페이지로 이동
+            console.log('Selected building:', buildingId);
+        });
+    });
+
+    // 환경 데이터 차트
+    const envCtx = document.getElementById('envChart').getContext('2d');
+    envChart = new Chart(envCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['온도', '습도', '공실률'],
+            datasets: [{
+                data: [20, 60, 50],
+                backgroundColor: ['#e74c3c', '#3498db', '#f39c12']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // 시간대별 패턴 차트 - 완전히 새로운 구현
+    const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+    
+    // 24시간 고정 데이터
+    const hourlyLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+    const hourlyData = [15, 12, 10, 8, 7, 6, 20, 25, 45, 55, 60, 65, 70, 68, 65, 62, 58, 55, 50, 40, 35, 30, 20, 18];
+    const hourlyColors = [
+        '#17a2b8', '#17a2b8', '#17a2b8', '#17a2b8', '#17a2b8', '#17a2b8', // 00-05시 (심야)
+        '#28a745', '#28a745', // 06-07시 (이동시간)
+        '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', '#ffc107', // 08-17시 (업무시간)
+        '#ffc107', // 18시 (업무시간)
+        '#28a745', '#28a745', '#28a745', // 19-21시 (이동시간)
+        '#17a2b8', '#17a2b8' // 22-23시 (심야)
+    ];
+    
+    hourlyChart = new Chart(hourlyCtx, {
+        type: 'bar',
+        data: {
+            labels: hourlyLabels,
+            datasets: [{
+                label: '평균 전력 사용량',
+                data: hourlyData,
+                backgroundColor: hourlyColors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const hour = parseInt(context[0].label);
+                            const nextHour = (hour + 1) % 24;
+                            return `${hour.toString().padStart(2, '0')}시-${nextHour.toString().padStart(2, '0')}시`;
+                        },
+                        label: function(context) {
+                            return `평균 전력 사용량: ${context.parsed.y.toFixed(1)} kWh`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 80,
+                    min: 0,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            }
+        }
+    });
+
+    // 건물별 비교 차트
+    const buildingCtx = document.getElementById('buildingChart').getContext('2d');
+    buildingChart = new Chart(buildingCtx, {
+        type: 'bar',
+        data: {
+            labels: ['B001', 'B002', 'B003', 'B004', 'B005'],
+            datasets: [{
+                label: '평균 전력 사용량',
+                data: [45, 38, 52, 41, 47],
+                backgroundColor: ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function loadRealTimeData() {
+    // 실시간 데이터 로드
+    $.ajax({
+        url: '/api/real_time',
+        method: 'GET',
+        success: function(data) {
+            const powerColor = getPowerColor(data.power_consumption);
+            $('#current-power').text(data.power_consumption.toFixed(1) + ' kWh').removeClass().addClass('card-title ' + powerColor);
+            $('#current-temp').text(data.temperature.toFixed(1));
+            $('#current-occupancy').text(data.occupancy.toFixed(0));
+            
+            // 실시간 차트 업데이트
+            updateRealTimeChart(data);
+        },
+        error: function(xhr, status, error) {
+            console.log('실시간 데이터 로드 실패:', error);
+        }
+    });
+
+    // 시계열 데이터 로드
+    $.ajax({
+        url: '/api/timeseries',
+        method: 'GET',
+        success: function(data) {
+            updateTimeSeriesChart(data);
+        },
+        error: function(xhr, status, error) {
+            console.log('시계열 데이터 로드 실패:', error);
+        }
+    });
+}
+
+function updateRealTimeChart(data) {
+    // 환경 데이터 차트 업데이트
+    envChart.data.datasets[0].data = [
+        data.temperature,
+        data.humidity,
+        data.occupancy
+    ];
+    envChart.update();
+}
+
+function updateTimeSeriesChart(data) {
+    // 전력 사용량 차트 업데이트
+    const labels = data.timestamps.map(t => new Date(Date.now() - (100 - t) * 60000).toLocaleTimeString());
+    
+    powerChart.data.labels = labels;
+    powerChart.data.datasets[0].data = data.power_consumption;
+    powerChart.update();
+}
+
+// 최근 데이터 테이블 업데이트
+// 전력 사용량 색상 기준 함수
+function getPowerColor(power) {
+    if (power <= 10) {
+        return 'text-primary'; // 파란색 (낮음)
+    } else if (power <= 30) {
+        return 'text-success'; // 초록색 (매우 낮음)
+    } else if (power <= 60) {
+        return 'text-warning'; // 노란색 (보통)
+    } else {
+        return 'text-danger'; // 빨간색 (높음/매우 높음)
+    }
+}
+
+function getPowerStatus(power) {
+    if (power <= 10) {
+        return '매우 낮음';
+    } else if (power <= 30) {
+        return '낮음';
+    } else if (power <= 60) {
+        return '보통';
+    } else {
+        return power > 100 ? '매우 높음' : '높음';
+    }
+}
+
+function updateDataTable() {
+    const tableBody = $('#data-table');
+    tableBody.empty();
+    
+    // 샘플 데이터 (실제로는 API에서 가져옴)
+    const sampleData = [
+        { time: '14:30', building: 'B001', power: 45.2, temp: 22.5, humidity: 65, occupancy: 80 },
+        { time: '14:25', building: 'B002', power: 38.7, temp: 21.8, humidity: 62, occupancy: 75 },
+        { time: '14:20', building: 'B003', power: 52.1, temp: 23.2, humidity: 68, occupancy: 90 },
+        { time: '14:15', building: 'B004', power: 41.3, temp: 22.0, humidity: 64, occupancy: 70 },
+        { time: '14:10', building: 'B005', power: 47.8, temp: 22.8, humidity: 66, occupancy: 85 }
+    ];
+    
+    sampleData.forEach(row => {
+        const powerColor = getPowerColor(row.power);
+        const powerStatus = getPowerStatus(row.power);
+        const tr = `
+            <tr>
+                <td>${row.time}</td>
+                <td>${row.building}</td>
+                <td><span class="${powerColor} fw-bold">${row.power.toFixed(1)} kWh</span></td>
+                <td>${row.temp}°C</td>
+                <td>${row.humidity}%</td>
+                <td>${row.occupancy}%</td>
+                <td><span class="badge bg-${powerColor.replace('text-', '')}">${powerStatus}</span></td>
+            </tr>
+        `;
+        tableBody.append(tr);
+    });
+}
+
+// 초기 데이터 테이블 로드
+updateDataTable();
+</script>
+
+<style>
+    /* Building Cards Styles */
+    .building-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 15px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .building-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #007bff;
+    }
+    
+    .building-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .building-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0;
+        color: #2c3e50;
+    }
+    
+    .building-status {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    
+    .building-status.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .building-status.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .building-status.danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .building-floors {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .floor-item {
+        padding: 8px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .floor-item:hover {
+        background-color: #e9ecef;
+    }
+    
+    .floor-name {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #495057;
+        display: block;
+        margin-bottom: 4px;
+    }
+    
+    .floor-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .floor-stats small {
+        font-size: 0.7rem;
+    }
+    
+    .temp-value, .power-value {
+        font-weight: 600;
+        color: #007bff;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .building-card {
+            margin-bottom: 15px;
+        }
+        
+        .building-title {
+            font-size: 0.8rem;
+        }
+        
+        .floor-name {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+{% endblock %}

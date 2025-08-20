@@ -839,6 +839,332 @@ def api_iot_dashboard():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# 건물 관리자용 새로운 API 엔드포인트들
+@app.route('/api/building-manager/quick-actions')
+def api_building_manager_actions():
+    """건물 관리자용 빠른 액션 API"""
+    try:
+        return jsonify({
+            'actions': [
+                {
+                    'id': 'temp_optimize',
+                    'name': '온도 최적화',
+                    'description': '현재 온도를 에너지 효율적으로 조정',
+                    'savings': '1,200원/일',
+                    'impact': 'high',
+                    'executable': True
+                },
+                {
+                    'id': 'lighting_control',
+                    'name': '조명 제어',
+                    'description': '불필요한 조명 자동 차단',
+                    'savings': '800원/일',
+                    'impact': 'medium',
+                    'executable': True
+                },
+                {
+                    'id': 'standby_power',
+                    'name': '대기전력 차단',
+                    'description': '사용하지 않는 장비의 대기전력 차단',
+                    'savings': '500원/일',
+                    'impact': 'low',
+                    'executable': True
+                },
+                {
+                    'id': 'hvac_schedule',
+                    'name': 'HVAC 스케줄 조정',
+                    'description': '사용 패턴에 맞춘 공조시스템 운영',
+                    'savings': '2,000원/일',
+                    'impact': 'high',
+                    'executable': True
+                }
+            ],
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/building-manager/execute-action', methods=['POST'])
+def api_execute_action():
+    """액션 실행 API"""
+    try:
+        data = request.get_json()
+        action_id = data.get('action_id')
+        building_id = data.get('building_id')
+        
+        if not action_id:
+            return jsonify({'error': '액션 ID가 필요합니다.'}), 400
+        
+        # 액션 실행 시뮬레이션
+        action_results = {
+            'temp_optimize': {
+                'status': 'success',
+                'message': '온도가 2도 낮춰졌습니다.',
+                'savings': 1200,
+                'execution_time': '즉시'
+            },
+            'lighting_control': {
+                'status': 'success',
+                'message': '15개 조명이 자동으로 꺼졌습니다.',
+                'savings': 800,
+                'execution_time': '즉시'
+            },
+            'standby_power': {
+                'status': 'success',
+                'message': '8개 장비의 대기전력이 차단되었습니다.',
+                'savings': 500,
+                'execution_time': '즉시'
+            },
+            'hvac_schedule': {
+                'status': 'success',
+                'message': 'HVAC 스케줄이 업데이트되었습니다.',
+                'savings': 2000,
+                'execution_time': '5분 후 적용'
+            }
+        }
+        
+        result = action_results.get(action_id, {
+            'status': 'error',
+            'message': '알 수 없는 액션입니다.'
+        })
+        
+        return jsonify({
+            'action_id': action_id,
+            'building_id': building_id,
+            'result': result,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/building-manager/cost-analysis')
+def api_cost_analysis():
+    """실시간 비용 분석 API"""
+    try:
+        import random
+        
+        # 실시간 비용 계산
+        current_hour = datetime.now().hour
+        base_hourly_cost = 500 + (current_hour * 50)  # 시간에 따른 기본 비용
+        
+        # 일간 비용
+        daily_cost = base_hourly_cost * 24
+        daily_savings = daily_cost * 0.15
+        
+        # 월간 비용
+        monthly_cost = daily_cost * 30
+        monthly_savings = daily_savings * 30
+        
+        # 효율성 비율
+        efficiency_ratio = 75 + random.randint(0, 20)
+        
+        # 목표 달성률
+        monthly_goal_target = 50000
+        monthly_goal_achieved = monthly_savings
+        goal_percentage = min(100, (monthly_goal_achieved / monthly_goal_target) * 100)
+        
+        return jsonify({
+            'daily_cost': int(daily_cost),
+            'monthly_cost': int(monthly_cost),
+            'savings_today': int(daily_savings),
+            'efficiency_ratio': efficiency_ratio,
+            'monthly_goal': {
+                'target': monthly_goal_target,
+                'achieved': int(monthly_goal_achieved),
+                'percentage': round(goal_percentage, 1)
+            },
+            'peak_hours': {
+                'current_hour': current_hour,
+                'is_peak': 14 <= current_hour <= 16,
+                'next_peak': '14:00' if current_hour < 14 else '내일 14:00'
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/building-manager/scenario-comparison')
+def api_scenario_comparison():
+    """시나리오 비교 API"""
+    try:
+        building_id = request.args.get('building_id', 'B001')
+        
+        # 기본 전력 사용량 (건물별)
+        base_power = {
+            'B001': 78,
+            'B002': 65,
+            'B003': 125,
+            'B004': 45,
+            'B005': 89
+        }.get(building_id, 78)
+        
+        # 현재 설정
+        current_power = base_power
+        
+        # 최적화 시나리오
+        optimized_power = round(current_power * 0.82)  # 18% 절약
+        
+        # 절약량
+        savings_power = current_power - optimized_power
+        savings_cost = savings_power * 150  # kWh당 150원
+        
+        # 추가 시나리오들
+        scenarios = {
+            'current': {
+                'name': '현재 설정',
+                'power': current_power,
+                'cost': current_power * 150,
+                'description': '현재 운영 방식'
+            },
+            'optimized': {
+                'name': '최적화',
+                'power': optimized_power,
+                'cost': optimized_power * 150,
+                'description': 'AI 권장 최적화 적용'
+            },
+            'eco_mode': {
+                'name': '에코 모드',
+                'power': round(current_power * 0.75),
+                'cost': round(current_power * 0.75) * 150,
+                'description': '최대 절약 모드'
+            },
+            'performance_mode': {
+                'name': '성능 모드',
+                'power': round(current_power * 1.15),
+                'cost': round(current_power * 1.15) * 150,
+                'description': '최대 성능 우선'
+            }
+        }
+        
+        # 비교 분석
+        comparison = {
+            'scenarios': scenarios,
+            'savings': {
+                'power_kwh': savings_power,
+                'cost_daily': savings_cost,
+                'cost_monthly': savings_cost * 30,
+                'cost_annual': savings_cost * 365
+            },
+            'recommendations': [
+                '온도 설정을 2도 조정하면 추가로 5% 절약 가능',
+                '야간 시간대 자동 제어로 8% 추가 절약',
+                '주말 에코모드 적용으로 12% 추가 절약'
+            ],
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        return jsonify(comparison)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/building-manager/alerts')
+def api_manager_alerts():
+    """건물 관리자용 알림 API"""
+    try:
+        import random
+        
+        # 실시간 알림 생성
+        alerts = []
+        
+        # 전력 사용량 알림
+        if random.random() > 0.7:
+            alerts.append({
+                'type': 'power_high',
+                'severity': 'warning',
+                'title': '전력 사용량 증가',
+                'message': '현재 전력 사용량이 평균보다 15% 높습니다.',
+                'action': '즉시 확인 필요',
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        # 온도 알림
+        if random.random() > 0.8:
+            alerts.append({
+                'type': 'temperature',
+                'severity': 'info',
+                'title': '온도 최적화 기회',
+                'message': '온도를 1도 낮추면 일일 ₩800 절약 가능합니다.',
+                'action': '최적화 적용',
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        # 장비 상태 알림
+        if random.random() > 0.9:
+            alerts.append({
+                'type': 'equipment',
+                'severity': 'critical',
+                'title': '장비 점검 필요',
+                'message': 'HVAC 시스템의 효율이 감소하고 있습니다.',
+                'action': '정비 일정 확인',
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        # 기본 정보 알림
+        if not alerts:
+            alerts.append({
+                'type': 'info',
+                'severity': 'success',
+                'title': '시스템 정상',
+                'message': '모든 시스템이 정상적으로 운영되고 있습니다.',
+                'action': '계속 모니터링',
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return jsonify({
+            'alerts': alerts,
+            'count': len(alerts),
+            'critical_count': len([a for a in alerts if a['severity'] == 'critical']),
+            'warning_count': len([a for a in alerts if a['severity'] == 'warning']),
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/building-manager/report-export', methods=['POST'])
+def api_export_report():
+    """보고서 내보내기 API"""
+    try:
+        data = request.get_json()
+        building_id = data.get('building_id', 'B001')
+        report_type = data.get('report_type', 'daily')
+        
+        # 보고서 데이터 생성
+        report_data = {
+            'building_id': building_id,
+            'report_type': report_type,
+            'generated_at': datetime.now().isoformat(),
+            'period': {
+                'start': (datetime.now() - timedelta(days=1)).isoformat(),
+                'end': datetime.now().isoformat()
+            },
+            'summary': {
+                'total_power_consumption': 1234.5,
+                'average_efficiency': 82.3,
+                'cost_savings': 12450,
+                'carbon_reduction': 15.2
+            },
+            'recommendations': [
+                '온도 설정 최적화로 추가 5% 절약 가능',
+                '조명 스케줄 조정으로 일일 ₩800 절약',
+                '대기전력 관리로 월간 ₩15,000 절약'
+            ],
+            'download_url': f'/downloads/energy_report_{building_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'report': report_data,
+            'message': '보고서가 생성되었습니다.',
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     print("🚀 스마트 빌딩 에너지 관리 시스템 웹 대시보드 시작")
     print("📊 접속 주소: http://localhost:5000")

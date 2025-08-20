@@ -100,11 +100,19 @@ def iot_monitoring():
 @app.route('/api/predict', methods=['POST'])
 def api_predict():
     """예측 API"""
+    print("🔍 예측 API 호출됨")
+    
     if model is None or scaler is None:
+        print("❌ 모델 또는 스케일러가 로드되지 않음")
         return jsonify({'error': '모델이 로드되지 않았습니다.'}), 500
     
     try:
         data = request.get_json()
+        print(f"📥 받은 데이터: {data}")
+        
+        if not data:
+            print("❌ 요청 데이터가 없음")
+            return jsonify({'error': '요청 데이터가 없습니다.'}), 400
         
         # 입력 데이터 추출
         occupancy = float(data.get('occupancy', 50))
@@ -113,6 +121,8 @@ def api_predict():
         hour = int(data.get('hour', 12))
         building_id = data.get('building_id', 'B001')
         
+        print(f"📊 입력값: occupancy={occupancy}, temperature={temperature}, humidity={humidity}, hour={hour}, building_id={building_id}")
+        
         # 현재 시간 정보 동적 생성
         now = datetime.now()
         day_of_week = now.weekday()  # 0=월요일, 6=일요일
@@ -120,6 +130,8 @@ def api_predict():
         day_of_year = now.timetuple().tm_yday
         week_of_year = now.isocalendar()[1]
         is_weekend = 1 if day_of_week >= 5 else 0
+        
+        print(f"🕒 시간 정보: day_of_week={day_of_week}, month={month}, day_of_year={day_of_year}, week_of_year={week_of_year}, is_weekend={is_weekend}")
         
         # 특성 벡터 생성 (모델이 기대하는 67개 특성에 맞게 조정)
         features = np.zeros(67)  # 모델이 기대하는 특성 개수
@@ -230,9 +242,14 @@ def api_predict():
         for i, val in enumerate(building_encoded):
             features[62 + i] = val
         
+        print(f"🔧 특성 벡터 생성 완료: shape={features.shape}, non-zero={np.count_nonzero(features)}")
+        
         # 예측
         features_scaled = scaler.transform([features])
+        print(f"📏 스케일링 완료: shape={features_scaled.shape}")
+        
         prediction = float(model.predict(features_scaled)[0])  # float32를 float로 변환
+        print(f"🎯 원본 예측값: {prediction}")
         
         # 예측 결과를 현실적인 범위로 조정
         # 음수 값이 나올 수 있으므로 절댓값을 사용하고, 기본값을 더함
@@ -256,6 +273,8 @@ def api_predict():
         
         prediction = prediction * temp_factor * occupancy_factor
         
+        print(f"🎯 최종 예측값: {prediction}")
+        
         # 사용량 수준 분류 (새로운 색상 기준)
         if prediction <= 10:
             level = "매우 낮음"
@@ -270,7 +289,7 @@ def api_predict():
             level = "매우 높음" if prediction > 100 else "높음"
             color = "danger"
         
-        return jsonify({
+        result = {
             'prediction': round(prediction, 2),
             'level': level,
             'color': color,
@@ -281,9 +300,15 @@ def api_predict():
                 'hour': hour,
                 'building_id': building_id
             }
-        })
+        }
+        
+        print(f"✅ 예측 완료: {result}")
+        return jsonify(result)
     
     except Exception as e:
+        print(f"❌ 예측 오류: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'예측 오류: {str(e)}'}), 500
 
 @app.route('/api/performance')
@@ -335,6 +360,97 @@ def api_timeseries():
         'temperature': recent_data['temperature'].tolist() if 'temperature' in recent_data.columns else [],
         'occupancy': recent_data['occupancy'].tolist() if 'occupancy' in recent_data.columns else []
     })
+
+@app.route('/api/sensor-data')
+def api_sensor_data():
+    """실시간 센서 데이터 API"""
+    try:
+        building_id = request.args.get('building_id')
+        floor = request.args.get('floor')
+        
+        if not building_id or not floor:
+            return jsonify({'error': '건물 ID와 층 정보가 필요합니다.'}), 400
+        
+        print(f"🔍 센서 데이터 요청: {building_id} - {floor}층")
+        
+        # 실제 센서 데이터 시뮬레이션 (실제 환경에서는 실제 센서에서 데이터를 가져옴)
+        import random
+        import time
+        
+        # 기본 센서 데이터 (건물/층별 특성 반영)
+        base_data = {
+            'B001': {  # 본사 건물
+                1: {'temp': 22, 'hum': 55, 'occ': 15, 'power': 45},  # 로비
+                2: {'temp': 24, 'hum': 50, 'occ': 25, 'power': 78},  # 사무실
+                3: {'temp': 23, 'hum': 52, 'occ': 8, 'power': 35}   # 회의실
+            },
+            'B002': {  # 연구소
+                1: {'temp': 21, 'hum': 48, 'occ': 5, 'power': 28},  # 출입구
+                2: {'temp': 22, 'hum': 45, 'occ': 12, 'power': 65}, # 실험실
+                3: {'temp': 20, 'hum': 40, 'occ': 6, 'power': 42}   # 클린룸
+            },
+            'B003': {  # 생산공장
+                1: {'temp': 18, 'hum': 60, 'occ': 8, 'power': 55},  # 창고
+                2: {'temp': 25, 'hum': 55, 'occ': 18, 'power': 120}, # 생산라인
+                3: {'temp': 23, 'hum': 50, 'occ': 10, 'power': 68}  # 품질관리
+            },
+            'B004': {  # 창고
+                1: {'temp': 16, 'hum': 65, 'occ': 3, 'power': 25},  # 보관구역
+                2: {'temp': 4, 'hum': 35, 'occ': 2, 'power': 85},   # 냉장보관
+                3: {'temp': 15, 'hum': 70, 'occ': 5, 'power': 40}   # 하역장
+            },
+            'B005': {  # 사무실
+                1: {'temp': 23, 'hum': 53, 'occ': 12, 'power': 42}, # 접수처
+                2: {'temp': 24, 'hum': 51, 'occ': 35, 'power': 95}, # 오픈오피스
+                3: {'temp': 22, 'hum': 54, 'occ': 15, 'power': 58}  # 회의실
+            }
+        }
+        
+        # 기본 데이터 가져오기
+        if building_id not in base_data or int(floor) not in base_data[building_id]:
+            return jsonify({'error': '해당 건물/층의 센서 데이터가 없습니다.'}), 404
+        
+        base_sensor_data = base_data[building_id][int(floor)]
+        
+        # 실시간 변동성 추가 (실제 센서처럼 약간의 변동)
+        variation = 0.15  # 15% 변동
+        current_time = time.time()
+        
+        # 시간대별 변동성 (업무시간 vs 야간)
+        hour = int(time.strftime('%H', time.localtime(current_time)))
+        time_factor = 1.0
+        if 8 <= hour <= 18:  # 업무시간
+            time_factor = 1.2
+        elif 22 <= hour or hour <= 6:  # 야간
+            time_factor = 0.7
+        
+        # 랜덤 변동성 추가
+        def add_variation(base_value, variation_range=variation):
+            random_factor = 1 + (random.random() - 0.5) * variation_range
+            return round(base_value * random_factor * time_factor, 1)
+        
+        # 실시간 센서 데이터 생성
+        real_time_data = {
+            'temp': add_variation(base_sensor_data['temp'], 0.1),  # 온도는 적은 변동
+            'hum': add_variation(base_sensor_data['hum'], 0.2),    # 습도는 중간 변동
+            'occ': max(0, round(add_variation(base_sensor_data['occ'], 0.3))),  # 인원은 큰 변동
+            'power': max(5, round(add_variation(base_sensor_data['power'], 0.25)))  # 전력은 중간 변동
+        }
+        
+        # 데이터 유효성 검증
+        real_time_data['temp'] = max(-10, min(40, real_time_data['temp']))  # -10°C ~ 40°C
+        real_time_data['hum'] = max(0, min(100, real_time_data['hum']))     # 0% ~ 100%
+        real_time_data['occ'] = max(0, min(100, real_time_data['occ']))     # 0명 ~ 100명
+        real_time_data['power'] = max(5, min(200, real_time_data['power'])) # 5kWh ~ 200kWh
+        
+        print(f"✅ 센서 데이터 생성 완료: {real_time_data}")
+        return jsonify(real_time_data)
+        
+    except Exception as e:
+        print(f"❌ 센서 데이터 오류: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'센서 데이터 오류: {str(e)}'}), 500
 
 @app.route('/api/stats')
 def api_stats():

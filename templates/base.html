@@ -16,17 +16,23 @@
     
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-bg: #ecf0f1;
+            --primary-color: #2980b9;      /* 코발트 블루 - 메인 */
+            --secondary-color: #7f8c8d;    /* 미드 그레이 - 서브 */
+            --accent-color: #00cec9;       /* 시안 - 포인트 */
+            --success-color: #27ae60;      /* 전력사용량 초록 - 유지 */
+            --warning-color: #f39c12;      /* 전력사용량 노랑 - 유지 */
+            --danger-color: #e74c3c;       /* 전력사용량 빨강 - 유지 */
+            --info-color: #3498db;         /* 전력사용량 파랑 - 유지 */
+            --background-color: #ffffff;   /* 화이트 - 배경 */
+            --light-bg: #f8f9fa;           /* 연한 회색 - 보조 배경 */
+            --text-primary: #2c3e50;       /* 진한 회색 - 텍스트 */
+            --text-secondary: #6c757d;     /* 중간 회색 - 보조 텍스트 */
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-bg);
+            background-color: var(--background-color);
+            color: var(--text-primary);
         }
         
         .navbar-brand {
@@ -34,19 +40,55 @@
             color: var(--primary-color) !important;
         }
         
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+            box-shadow: 0 2px 10px rgba(41, 128, 185, 0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+        
         .card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background: var(--background-color);
         }
         
         .card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             color: white;
         }
         
@@ -63,30 +105,49 @@
         }
         
         .btn-primary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.3);
         }
         
-        .nav-link {
-            color: var(--primary-color) !important;
-            font-weight: 500;
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            border-radius: 10px;
         }
         
-        .nav-link.active {
-            background-color: var(--secondary-color) !important;
-            color: white !important;
-            border-radius: 8px;
+        .btn-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 206, 201, 0.25);
         }
         
         .chart-container {
             position: relative;
             height: 400px;
             margin: 20px 0;
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
         
         .prediction-result {
@@ -96,6 +157,8 @@
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
         }
         
         .loading {
@@ -107,10 +170,11 @@
         .spinner-border {
             width: 3rem;
             height: 3rem;
+            color: var(--accent-color);
         }
         
         .footer {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             text-align: center;
             padding: 20px 0;
@@ -120,17 +184,260 @@
         .real-time-indicator {
             width: 10px;
             height: 10px;
-            background-color: var(--success-color);
+            background-color: var(--accent-color);
             border-radius: 50%;
             display: inline-block;
             margin-right: 5px;
             animation: pulse 2s infinite;
         }
         
+        .alert-info {
+            background-color: rgba(0, 206, 201, 0.1);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+        
+        .alert-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-color: var(--warning-color);
+            color: var(--text-primary);
+        }
+        
+        .alert-success {
+            background-color: rgba(39, 174, 96, 0.1);
+            border-color: var(--success-color);
+            color: var(--text-primary);
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--danger-color) !important;
+        }
+        
+        .bg-info {
+            background-color: var(--info-color) !important;
+        }
+        
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
+        }
+        
+        /* 센서 값 스타일 */
+        .sensor-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        /* 전력 사용량 상태 표시 색상 - 유지 */
+        .power-status-low { color: var(--info-color); }
+        .power-status-normal { color: var(--success-color); }
+        .power-status-high { color: var(--warning-color); }
+        .power-status-critical { color: var(--danger-color); }
+        
+        /* 추가 스타일 개선 */
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+        }
+        
+        .display-4 {
+            color: var(--primary-color);
+        }
+        
+        .lead {
+            color: var(--text-secondary);
+        }
+        
+        /* 건물 카드 스타일 */
+        .building-card {
+            background: var(--background-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .building-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .building-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .building-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .building-status {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .building-status.success {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+        
+        .building-status.warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .building-status.danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .floor-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .floor-item:last-child {
+            border-bottom: none;
+        }
+        
+        .floor-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .floor-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        /* 테이블 스타일 개선 */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(0, 206, 201, 0.05);
+        }
+        
+        /* 리스트 그룹 스타일 */
+        .list-group-item {
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            background-color: rgba(0, 206, 201, 0.05);
+            transform: translateX(5px);
+        }
+        
+        /* 프로그레스 바 스타일 */
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+        }
+        
+        /* 배지 스타일 */
+        .badge {
+            border-radius: 15px;
+            font-weight: 500;
+        }
+        
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+        }
+        
+        /* 모달 스타일 */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+        
+        /* 툴팁 스타일 */
+        .tooltip-inner {
+            background-color: var(--text-primary);
+            border-radius: 8px;
+        }
+        
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
         }
     </style>
     

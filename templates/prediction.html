@@ -63,16 +63,29 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label for="building_id" class="form-label fw-bold">관리 건물</label>
-                        <select class="form-select form-select-lg" id="building_id" name="building_id" required onchange="updateBuildingInfo()">
-                            <option value="">건물을 선택하세요</option>
-                            <option value="B001">🏢 B001 - 본사 건물 (5층)</option>
-                            <option value="B002">🔬 B002 - 연구소 (3층)</option>
-                            <option value="B003">🏭 B003 - 생산공장 (2층)</option>
-                            <option value="B004">📦 B004 - 창고 (1층)</option>
-                            <option value="B005">🏢 B005 - 사무실 (4층)</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="building_id" class="form-label fw-bold">건물 선택</label>
+                            <select class="form-select" id="building_id" name="building_id" required onchange="updateBuildingInfo()">
+                                <option value="">건물을 선택하세요</option>
+                                <option value="B001">🏢 B001 - 본사 건물</option>
+                                <option value="B002">🔬 B002 - 연구소</option>
+                                <option value="B003">🏭 B003 - 생산공장</option>
+                                <option value="B004">📦 B004 - 창고</option>
+                                <option value="B005">🏢 B005 - 사무실</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="floor_id" class="form-label fw-bold">층 선택</label>
+                            <select class="form-select" id="floor_id" name="floor_id" required onchange="updateFloorInfo()">
+                                <option value="">층을 선택하세요</option>
+                                <option value="1">1층</option>
+                                <option value="2">2층</option>
+                                <option value="3">3층</option>
+                                <option value="4">4층</option>
+                                <option value="5">5층</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div id="building-info" class="alert alert-light" style="display: none;">
@@ -550,27 +563,51 @@ const buildingData = {
         name: '본사 건물',
         floors: 5,
         description: '메인 오피스 건물 - 일반 사무실, 회의실, 로비 포함',
-        sensors: { temp: 24, hum: 52, occ: 45, power: 78 }
+        floorData: {
+            1: { name: '로비', sensors: { temp: 22, hum: 55, occ: 15, power: 45 } },
+            2: { name: '사무실', sensors: { temp: 24, hum: 50, occ: 25, power: 78 } },
+            3: { name: '회의실', sensors: { temp: 23, hum: 52, occ: 8, power: 35 } },
+            4: { name: '개별실', sensors: { temp: 24, hum: 51, occ: 12, power: 42 } },
+            5: { name: '관리실', sensors: { temp: 23, hum: 53, occ: 5, power: 28 } }
+        }
     },
     'B002': {
         name: '연구소',
+        floors: 3,
         description: '연구개발 전용 시설 - 실험실, 클린룸, 분석실 포함',
-        sensors: { temp: 22, hum: 45, occ: 28, power: 65 }
+        floorData: {
+            1: { name: '출입구', sensors: { temp: 21, hum: 48, occ: 5, power: 28 } },
+            2: { name: '실험실', sensors: { temp: 22, hum: 45, occ: 12, power: 65 } },
+            3: { name: '클린룸', sensors: { temp: 20, hum: 40, occ: 6, power: 42 } }
+        }
     },
     'B003': {
         name: '생산공장',
+        floors: 2,
         description: '제조 및 생산 시설 - 생산라인, 품질관리실 포함',
-        sensors: { temp: 26, hum: 58, occ: 35, power: 125 }
+        floorData: {
+            1: { name: '창고', sensors: { temp: 18, hum: 60, occ: 8, power: 55 } },
+            2: { name: '생산라인', sensors: { temp: 25, hum: 55, occ: 18, power: 120 } }
+        }
     },
     'B004': {
         name: '창고',
+        floors: 1,
         description: '물류 및 보관 시설 - 일반창고, 냉장보관실 포함',
-        sensors: { temp: 18, hum: 65, occ: 12, power: 45 }
+        floorData: {
+            1: { name: '보관구역', sensors: { temp: 16, hum: 65, occ: 3, power: 25 } }
+        }
     },
     'B005': {
         name: '사무실',
+        floors: 4,
         description: '부서별 사무공간 - 오픈오피스, 개별실, 회의실 포함',
-        sensors: { temp: 23, hum: 50, occ: 52, power: 89 }
+        floorData: {
+            1: { name: '접수처', sensors: { temp: 23, hum: 53, occ: 12, power: 42 } },
+            2: { name: '오픈오피스', sensors: { temp: 24, hum: 51, occ: 35, power: 95 } },
+            3: { name: '회의실', sensors: { temp: 22, hum: 54, occ: 15, power: 58 } },
+            4: { name: '개별실', sensors: { temp: 23, hum: 52, occ: 8, power: 38 } }
+        }
     }
 };
 
@@ -598,6 +635,7 @@ function dismissAlert() {
 // 건물 정보 업데이트
 function updateBuildingInfo() {
     const buildingId = document.getElementById('building_id').value;
+    const floorSelect = document.getElementById('floor_id');
     const infoDiv = document.getElementById('building-info');
     const descSpan = document.getElementById('building-description');
     const sensorDiv = document.getElementById('sensor-summary');
@@ -609,25 +647,55 @@ function updateBuildingInfo() {
         descSpan.textContent = building.description;
         infoDiv.style.display = 'block';
         
-        // 센서 데이터 표시
-        document.getElementById('current-temp').textContent = `${building.sensors.temp}°C`;
-        document.getElementById('current-power').textContent = `${building.sensors.power}kWh`;
-        document.getElementById('current-hum').textContent = `${building.sensors.hum}%`;
-        document.getElementById('current-occ').textContent = `${building.sensors.occ}명`;
-        sensorDiv.style.display = 'block';
+        // 층 선택 옵션 업데이트
+        floorSelect.innerHTML = '<option value="">층을 선택하세요</option>';
+        for (let i = 1; i <= building.floors; i++) {
+            const floorName = building.floorData[i].name;
+            floorSelect.innerHTML += `<option value="${i}">${i}층 - ${floorName}</option>`;
+        }
+        
+        // 층 선택 초기화
+        floorSelect.value = '';
+        
+        // 센서 데이터 숨기기 (층 선택 후 표시)
+        sensorDiv.style.display = 'none';
         
         // 자동으로 현재 시간 설정
         const now = new Date();
         document.getElementById('hour').value = now.getHours();
         
-        // 스마트 알림 표시
-        if (building.sensors.power > 100) {
-            showSmartAlert(`${building.name}의 전력 사용량이 평균보다 높습니다. 즉시 확인하세요!`, 'warning');
-        } else {
-            showSmartAlert(`${building.name} 선택됨. 현재 전력 사용량은 정상 범위입니다.`, 'success');
-        }
+        showSmartAlert(`${building.name} 선택됨. 층을 선택해주세요.`, 'info');
     } else {
         infoDiv.style.display = 'none';
+        sensorDiv.style.display = 'none';
+        floorSelect.innerHTML = '<option value="">층을 선택하세요</option>';
+    }
+}
+
+// 층 정보 업데이트
+function updateFloorInfo() {
+    const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    const sensorDiv = document.getElementById('sensor-summary');
+    
+    if (buildingId && floorId && buildingData[buildingId] && buildingData[buildingId].floorData[floorId]) {
+        const building = buildingData[buildingId];
+        const floor = building.floorData[floorId];
+        
+        // 센서 데이터 표시
+        document.getElementById('current-temp').textContent = `${floor.sensors.temp}°C`;
+        document.getElementById('current-power').textContent = `${floor.sensors.power}kWh`;
+        document.getElementById('current-hum').textContent = `${floor.sensors.hum}%`;
+        document.getElementById('current-occ').textContent = `${floor.sensors.occ}명`;
+        sensorDiv.style.display = 'block';
+        
+        // 스마트 알림 표시
+        if (floor.sensors.power > 100) {
+            showSmartAlert(`${building.name} ${floorId}층(${floor.name})의 전력 사용량이 높습니다.`, 'warning');
+        } else {
+            showSmartAlert(`${building.name} ${floorId}층(${floor.name}) 선택됨.`, 'success');
+        }
+    } else {
         sensorDiv.style.display = 'none';
     }
 }
@@ -665,26 +733,35 @@ function setSmartPreset(type) {
 // 현재 데이터 사용
 function useCurrentData() {
     const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    
     if (!buildingId) {
         showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
         return;
     }
     
+    if (!floorId) {
+        showSmartAlert('먼저 층을 선택해주세요!', 'warning');
+        return;
+    }
+    
     const building = buildingData[buildingId];
-    if (building) {
-        document.getElementById('temperature').value = building.sensors.temp;
-        document.getElementById('humidity').value = building.sensors.hum;
-        document.getElementById('occupancy').value = Math.round((building.sensors.occ / 60) * 100);
+    const floor = building.floorData[floorId];
+    
+    if (building && floor) {
+        document.getElementById('temperature').value = floor.sensors.temp;
+        document.getElementById('humidity').value = floor.sensors.hum;
+        document.getElementById('occupancy').value = Math.round((floor.sensors.occ / 60) * 100);
         
-        updateTempValue(building.sensors.temp);
-        updateHumValue(building.sensors.hum);
-        updateOccValue(Math.round((building.sensors.occ / 60) * 100));
+        updateTempValue(floor.sensors.temp);
+        updateHumValue(floor.sensors.hum);
+        updateOccValue(Math.round((floor.sensors.occ / 60) * 100));
         
         // 현재 시간 설정
         const now = new Date();
         document.getElementById('hour').value = now.getHours();
         
-        showSmartAlert('현재 센서 데이터가 예측 조건에 적용되었습니다.', 'success');
+        showSmartAlert(`${building.name} ${floorId}층(${floor.name})의 현재 센서 데이터가 적용되었습니다.`, 'success');
     }
 }
 
@@ -704,8 +781,15 @@ function updateOccValue(value) {
 // 빠른 예측
 function quickPredict() {
     const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    
     if (!buildingId) {
         showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    if (!floorId) {
+        showSmartAlert('먼저 층을 선택해주세요!', 'warning');
         return;
     }
     
@@ -723,8 +807,15 @@ function quickPredict() {
 // 시나리오 비교
 function compareScenarios() {
     const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    
     if (!buildingId) {
         showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    if (!floorId) {
+        showSmartAlert('먼저 층을 선택해주세요!', 'warning');
         return;
     }
     
@@ -734,7 +825,8 @@ function compareScenarios() {
     if (comparisonDiv.style.display === 'block') {
         // 시나리오 데이터 업데이트
         const building = buildingData[buildingId];
-        const currentPower = building.sensors.power;
+        const floor = building.floorData[floorId];
+        const currentPower = floor.sensors.power;
         const optimizedPower = Math.round(currentPower * 0.85);
         const savings = currentPower - optimizedPower;
         
@@ -742,43 +834,52 @@ function compareScenarios() {
         document.getElementById('scenario-optimized').textContent = `${optimizedPower} kWh`;
         document.getElementById('scenario-savings').textContent = `${savings} kWh`;
         
-        showSmartAlert('시나리오 비교 분석이 표시되었습니다.', 'info');
+        showSmartAlert(`${building.name} ${floorId}층(${floor.name}) 시나리오 비교 분석이 표시되었습니다.`, 'info');
     }
 }
 
 // 보고서 내보내기
 function exportReport() {
     const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    
     if (!buildingId) {
         showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
         return;
     }
     
+    if (!floorId) {
+        showSmartAlert('먼저 층을 선택해주세요!', 'warning');
+        return;
+    }
+    
     // 간단한 보고서 생성 시뮬레이션
     const building = buildingData[buildingId];
+    const floor = building.floorData[floorId];
     const reportData = {
         building: building.name,
+        floor: `${floorId}층 - ${floor.name}`,
         timestamp: new Date().toISOString(),
-        power: building.sensors.power,
+        power: floor.sensors.power,
         efficiency: 75,
-        savings: Math.round(building.sensors.power * 0.15)
+        savings: Math.round(floor.sensors.power * 0.15)
     };
     
     // CSV 형태로 다운로드 시뮬레이션
-    const csvContent = `건물명,시간,전력사용량,효율성,절약가능량
-${reportData.building},${new Date().toLocaleString()},${reportData.power}kWh,${reportData.efficiency}%,${reportData.savings}kWh`;
+    const csvContent = `건물명,층,시간,전력사용량,효율성,절약가능량
+${reportData.building},${reportData.floor},${new Date().toLocaleString()},${reportData.power}kWh,${reportData.efficiency}%,${reportData.savings}kWh`;
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `energy_report_${buildingId}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `energy_report_${buildingId}_${floorId}F_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    showSmartAlert('에너지 보고서가 다운로드되었습니다.', 'success');
+    showSmartAlert(`${building.name} ${floorId}층(${floor.name}) 에너지 보고서가 다운로드되었습니다.`, 'success');
 }
 
 // 액션 실행

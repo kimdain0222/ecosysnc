@@ -31,14 +31,33 @@ IOT_CONFIG_PATH = 'iot_sensors/config/sensor_config.json'
 
 # 모델 및 데이터 로드
 try:
+    print(f"🔍 모델 파일 확인: {MODEL_PATH}")
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(f"모델 파일을 찾을 수 없습니다: {MODEL_PATH}")
+    
+    print(f"🔍 스케일러 파일 확인: {SCALER_PATH}")
+    if not os.path.exists(SCALER_PATH):
+        raise FileNotFoundError(f"스케일러 파일을 찾을 수 없습니다: {SCALER_PATH}")
+    
+    print(f"🔍 데이터 파일 확인: {DATA_PATH}")
+    if not os.path.exists(DATA_PATH):
+        raise FileNotFoundError(f"데이터 파일을 찾을 수 없습니다: {DATA_PATH}")
+    
+    print("📥 모델 로드 중...")
     model = joblib.load(MODEL_PATH)
+    print("📥 스케일러 로드 중...")
     scaler = joblib.load(SCALER_PATH)
+    print("📥 데이터 로드 중...")
     df = pd.read_csv(DATA_PATH)
+    print("📥 성능 데이터 로드 중...")
     performance_df = pd.read_csv(PERFORMANCE_PATH, index_col=0)
+    print("📥 중요도 데이터 로드 중...")
     importance_df = pd.read_csv(IMPORTANCE_PATH)
     print("✅ 모델 및 데이터 로드 완료")
 except Exception as e:
     print(f"❌ 모델 로드 오류: {e}")
+    import traceback
+    traceback.print_exc()
     model = None
     scaler = None
     df = None

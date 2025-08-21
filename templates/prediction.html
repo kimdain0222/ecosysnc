@@ -261,6 +261,11 @@
                             <span class="visually-hidden">Loading...</span>
                         </div>
                         <p class="text-muted">AI가 최적의 예측을 계산 중입니다...</p>
+                        <div class="progress mt-3" style="height: 6px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 100%"></div>
+                        </div>
+                        <small class="text-muted mt-2 d-block">잠시만 기다려주세요...</small>
                     </div>
 
                     <!-- 예측 결과 -->
@@ -912,8 +917,21 @@ document.getElementById('prediction-form').addEventListener('submit', function(e
     e.preventDefault();
     
     const buildingId = document.getElementById('building_id').value;
+    const floorId = document.getElementById('floor_id').value;
+    const hour = document.getElementById('hour').value;
+    
     if (!buildingId) {
         showSmartAlert('건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    if (!floorId) {
+        showSmartAlert('층을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    if (!hour) {
+        showSmartAlert('예측 시간을 선택해주세요!', 'warning');
         return;
     }
     
@@ -924,74 +942,86 @@ document.getElementById('prediction-form').addEventListener('submit', function(e
     document.getElementById('initial-state').style.display = 'none';
     
     // 폼 데이터 수집
-    const hour = parseInt(document.getElementById('hour').value) || 12;
+    const hourValue = parseInt(hour) || 12;
     const temp = parseFloat(document.getElementById('temperature').value) || 22;
     const hum = parseFloat(document.getElementById('humidity').value) || 50;
     const occ = parseFloat(document.getElementById('occupancy').value) || 30;
     
-    // 예측 API 호출 시뮬레이션
-    setTimeout(() => {
-        // 실제 예측 로직 (간단한 알고리즘)
-        const building = buildingData[buildingId];
-        let basePower = building.sensors.power;
+    // 실제 예측 API 호출
+    const predictionData = {
+        building_id: buildingId,
+        hour: hourValue,
+        temperature: temp,
+        humidity: hum,
+        occupancy: occ
+    };
+    
+    fetch('/api/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(predictionData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('예측 결과:', data);
         
-        // 온도에 따른 조정
-        if (temp > 25) basePower *= 1.2;
-        else if (temp < 20) basePower *= 1.1;
-        
-        // 습도에 따른 조정
-        if (hum > 60) basePower *= 1.1;
-        
-        // 공실률에 따른 조정
-        basePower *= (1 - occ/100 * 0.3);
-        
-        // 시간에 따른 조정
-        if (hour >= 9 && hour <= 18) basePower *= 1.3;
-        else if (hour >= 19 && hour <= 23) basePower *= 0.8;
-        else basePower *= 0.6;
-        
-        const predictedPower = Math.round(basePower);
+        if (data.error) {
+            throw new Error(data.error);
+        }
         
         // 효율성 계산
         let efficiency = 85;
-        if (predictedPower > 100) efficiency = 60;
-        else if (predictedPower > 80) efficiency = 70;
-        else if (predictedPower > 60) efficiency = 80;
+        if (data.prediction > 100) efficiency = 60;
+        else if (data.prediction > 80) efficiency = 70;
+        else if (data.prediction > 60) efficiency = 80;
         
         // 절약량 계산
-        const savings = Math.round(predictedPower * 0.15);
+        const savings = Math.round(data.prediction * 0.15);
         const savingsCost = savings * 150; // kWh당 150원
         
         // 결과 표시
         showPredictionResult({
-            power: predictedPower,
+            power: data.prediction,
             efficiency: efficiency,
             savings: savings,
-            savingsCost: savingsCost
+            savingsCost: savingsCost,
+            level: data.level,
+            color: data.color
         });
         
         // 실시간 비용 업데이트
-        updateCostAnalysis(predictedPower);
+        updateCostAnalysis(data.prediction);
         
-    }, 2000);
+        // 성공 알림
+        showSmartAlert(`예측 완료! 예상 전력 사용량: ${data.prediction} kWh`, 'success');
+    })
+    .catch(error => {
+        console.error('예측 오류:', error);
+        
+        // 오류 상태 표시
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('error-text').textContent = `예측 중 오류가 발생했습니다: ${error.message}`;
+        
+        // 오류 알림
+        showSmartAlert(`예측 오류: ${error.message}`, 'danger');
+    });
 });
 
 function showPredictionResult(data) {
     // 전력 사용량 표시
     document.getElementById('prediction-value').textContent = `${data.power} kWh`;
     
-    // 레벨 표시
-    let level, levelClass;
-    if (data.power < 50) {
-        level = '낮음';
-        levelClass = 'success';
-    } else if (data.power < 80) {
-        level = '보통';
-        levelClass = 'warning';
-    } else {
-        level = '높음';
-        levelClass = 'danger';
-    }
+    // 레벨 표시 (서버에서 받은 정보 사용)
+    const level = data.level || '보통';
+    const levelClass = data.color || 'warning';
     
     document.getElementById('prediction-level').innerHTML = `<span class="badge bg-${levelClass}">${level}</span>`;
     

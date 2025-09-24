@@ -73,6 +73,10 @@ models/*.pkl  # All model files (can be large)
 *.tmp
 *.temp
 
+# Large files that exceed GitHub's 100MB limit
+temp_large_files/
+models/Random_Forest.pkl
+
 # Auto-generated files by GitHub Actions
 daily_activity.log
 weekly_summary.md

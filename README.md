@@ -182,9 +182,16 @@ python app.py
 - **패턴**: 업무시간/주말, 계절별 사용량 차이 분석
 
 ### AI 모델
-- **XGBoost**: 최고 성능 예측 모델
-- **다양한 알고리즘**: Random Forest, LightGBM, SVM 등
+- **XGBoost**: 최고 성능 예측 모델 (1.4MB)
+- **LightGBM**: 대안 모델 (286KB)
+- **Gradient Boosting**: Random Forest 대체 (139KB)
+- **Ridge Regression**: SVM 대체 (1KB)
 - **정확도**: 공실률 예측 85% 이상
+
+### 🚀 **최적화 특징**
+- **GitHub 호환**: 100MB 제한 이하로 모든 파일 최적화
+- **합성 데이터**: 원본 127MB → 합성 1-2MB
+- **효율적 모델**: 큰 모델들을 더 작고 빠른 모델로 대체
 
 ## 🛠️ 기술 스택
 

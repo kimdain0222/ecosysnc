@@ -76,6 +76,11 @@ models/*.pkl  # All model files (can be large)
 # Large files that exceed GitHub's 100MB limit
 temp_large_files/
 models/Random_Forest.pkl
+models/SVM.pkl
+data/raw/household_power_consumption.txt
+
+# Synthetic data (replaces large original files)
+data/raw/synthetic_household_power_consumption.csv
 
 # Auto-generated files by GitHub Actions
 daily_activity.log

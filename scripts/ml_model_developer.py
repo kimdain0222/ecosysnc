@@ -154,15 +154,15 @@ class SmartBuildingMLModels:
         """앙상블 모델 훈련"""
         logger.info("=== 앙상블 모델 훈련 시작 ===")
         
-        # 1. Random Forest
-        logger.info("Random Forest 훈련 중...")
-        rf_model, rf_results, rf_pred = self.evaluate_model(
-            RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1),
-            self.X_train, self.X_test, self.y_train, self.y_test, "Random Forest"
+        # 1. Random Forest → Gradient Boosting으로 대체 (더 효율적이고 작은 크기)
+        logger.info("Gradient Boosting (Random Forest 대체) 훈련 중...")
+        gb_model, gb_results, gb_pred = self.evaluate_model(
+            GradientBoostingRegressor(n_estimators=150, learning_rate=0.1, max_depth=6, random_state=42),
+            self.X_train, self.X_test, self.y_train, self.y_test, "Gradient_Boosting_v2"
         )
-        self.models['Random_Forest'] = rf_model
-        self.model_scores['Random_Forest'] = rf_results
-        self.feature_importance['Random_Forest'] = rf_model.feature_importances_
+        self.models['Gradient_Boosting_v2'] = gb_model
+        self.model_scores['Gradient_Boosting_v2'] = gb_results
+        self.feature_importance['Gradient_Boosting_v2'] = gb_model.feature_importances_
         
         # 2. Gradient Boosting
         logger.info("Gradient Boosting 훈련 중...")
@@ -196,21 +196,21 @@ class SmartBuildingMLModels:
         
         return rf_pred, gb_pred, xgb_pred, lgb_pred
     
-    def train_svm_model(self):
-        """SVM 모델 훈련"""
-        logger.info("=== SVM 모델 훈련 시작 ===")
+    def train_advanced_linear_model(self):
+        """고급 선형 모델 훈련 (SVM 대체)"""
+        logger.info("=== 고급 선형 모델 훈련 시작 (SVM 대체) ===")
         
-        # SVM (커널 트릭 사용)
-        logger.info("SVM 훈련 중...")
-        svm_model, svm_results, svm_pred = self.evaluate_model(
-            SVR(kernel='rbf', C=1.0, gamma='scale'),
+        # Ridge Regression (SVM 대체 - 더 작고 빠름)
+        logger.info("Ridge Regression (SVM 대체) 훈련 중...")
+        ridge_model, ridge_results, ridge_pred = self.evaluate_model(
+            Ridge(alpha=1.0, solver='auto'),
             self.X_train_scaled, self.X_test_scaled, 
-            self.y_train, self.y_test, "SVM"
+            self.y_train, self.y_test, "Ridge_Advanced"
         )
-        self.models['SVM'] = svm_model
-        self.model_scores['SVM'] = svm_results
+        self.models['Ridge_Advanced'] = ridge_model
+        self.model_scores['Ridge_Advanced'] = ridge_results
         
-        return svm_pred
+        return ridge_pred
     
     def hyperparameter_tuning(self, model_name='XGBoost'):
         """하이퍼파라미터 튜닝"""
@@ -351,8 +351,8 @@ class SmartBuildingMLModels:
         # 3. 앙상블 모델 훈련
         self.train_ensemble_models()
         
-        # 4. SVM 모델 훈련
-        self.train_svm_model()
+        # 4. 고급 선형 모델 훈련 (SVM 대체)
+        self.train_advanced_linear_model()
         
         # 5. 하이퍼파라미터 튜닝 (XGBoost)
         self.hyperparameter_tuning('XGBoost')

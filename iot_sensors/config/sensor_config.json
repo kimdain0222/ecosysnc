@@ -1,0 +1,988 @@
+{
+  "sensors": {
+    "temperature_sensors": [
+      {
+        "id": "temp_001",
+        "name": "1층 로비 온도센서",
+        "building_id": "B001",
+        "floor": 1,
+        "room_type": "lobby",
+        "mqtt_topic": "building/B001/floor1/lobby/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_001",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 15,
+          "max": 30,
+          "critical_min": 10,
+          "critical_max": 35
+        }
+      },
+      {
+        "id": "temp_002",
+        "name": "2층 사무실 온도센서",
+        "building_id": "B001",
+        "floor": 2,
+        "room_type": "office",
+        "mqtt_topic": "building/B001/floor2/office/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_002",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 18,
+          "max": 26,
+          "critical_min": 15,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "temp_003",
+        "name": "3층 회의실 온도센서",
+        "building_id": "B001",
+        "floor": 3,
+        "room_type": "meeting_room",
+        "mqtt_topic": "building/B001/floor3/meeting/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_003",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 20,
+          "max": 24,
+          "critical_min": 18,
+          "critical_max": 28
+        }
+      },
+      {
+        "id": "temp_004",
+        "name": "1층 출입구 온도센서",
+        "building_id": "B002",
+        "floor": 1,
+        "room_type": "entrance",
+        "mqtt_topic": "building/B002/floor1/entrance/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_004",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 15,
+          "max": 30,
+          "critical_min": 10,
+          "critical_max": 35
+        }
+      },
+      {
+        "id": "temp_005",
+        "name": "2층 실험실 온도센서",
+        "building_id": "B002",
+        "floor": 2,
+        "room_type": "lab",
+        "mqtt_topic": "building/B002/floor2/lab/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_005",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 18,
+          "max": 26,
+          "critical_min": 15,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "temp_006",
+        "name": "3층 클린룸 온도센서",
+        "building_id": "B002",
+        "floor": 3,
+        "room_type": "clean_room",
+        "mqtt_topic": "building/B002/floor3/clean_room/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_006",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 20,
+          "max": 24,
+          "critical_min": 18,
+          "critical_max": 28
+        }
+      },
+      {
+        "id": "temp_007",
+        "name": "1층 창고 온도센서",
+        "building_id": "B003",
+        "floor": 1,
+        "room_type": "warehouse",
+        "mqtt_topic": "building/B003/floor1/warehouse/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_007",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 15,
+          "max": 30,
+          "critical_min": 10,
+          "critical_max": 35
+        }
+      },
+      {
+        "id": "temp_008",
+        "name": "2층 생산라인 온도센서",
+        "building_id": "B003",
+        "floor": 2,
+        "room_type": "production_line",
+        "mqtt_topic": "building/B003/floor2/production_line/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_008",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 18,
+          "max": 26,
+          "critical_min": 15,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "temp_009",
+        "name": "3층 품질관리 온도센서",
+        "building_id": "B003",
+        "floor": 3,
+        "room_type": "quality_control",
+        "mqtt_topic": "building/B003/floor3/quality_control/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_009",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 20,
+          "max": 24,
+          "critical_min": 18,
+          "critical_max": 28
+        }
+      },
+      {
+        "id": "temp_010",
+        "name": "1층 보관구역 온도센서",
+        "building_id": "B004",
+        "floor": 1,
+        "room_type": "storage_area",
+        "mqtt_topic": "building/B004/floor1/storage_area/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_010",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 15,
+          "max": 30,
+          "critical_min": 10,
+          "critical_max": 35
+        }
+      },
+      {
+        "id": "temp_011",
+        "name": "2층 냉장보관 온도센서",
+        "building_id": "B004",
+        "floor": 2,
+        "room_type": "cold_storage",
+        "mqtt_topic": "building/B004/floor2/cold_storage/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_011",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 18,
+          "max": 26,
+          "critical_min": 15,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "temp_012",
+        "name": "3층 하역장 온도센서",
+        "building_id": "B004",
+        "floor": 3,
+        "room_type": "loading_dock",
+        "mqtt_topic": "building/B004/floor3/loading_dock/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_012",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 20,
+          "max": 24,
+          "critical_min": 18,
+          "critical_max": 28
+        }
+      },
+      {
+        "id": "temp_013",
+        "name": "1층 접수처 온도센서",
+        "building_id": "B005",
+        "floor": 1,
+        "room_type": "reception",
+        "mqtt_topic": "building/B005/floor1/reception/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_013",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 15,
+          "max": 30,
+          "critical_min": 10,
+          "critical_max": 35
+        }
+      },
+      {
+        "id": "temp_014",
+        "name": "2층 오픈오피스 온도센서",
+        "building_id": "B005",
+        "floor": 2,
+        "room_type": "open_office",
+        "mqtt_topic": "building/B005/floor2/open_office/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_014",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 18,
+          "max": 26,
+          "critical_min": 15,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "temp_015",
+        "name": "3층 회의실 온도센서",
+        "building_id": "B005",
+        "floor": 3,
+        "room_type": "conference_room",
+        "mqtt_topic": "building/B005/floor3/conference_room/temperature",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/temp_015",
+        "update_interval": 60,
+        "unit": "celsius",
+        "thresholds": {
+          "min": 20,
+          "max": 24,
+          "critical_min": 18,
+          "critical_max": 28
+        }
+      }
+    ],
+    "humidity_sensors": [
+      {
+        "id": "hum_001",
+        "name": "1층 로비 습도센서",
+        "building_id": "B001",
+        "floor": 1,
+        "room_type": "lobby",
+        "mqtt_topic": "building/B001/floor1/lobby/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_001",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 30,
+          "max": 70,
+          "critical_min": 20,
+          "critical_max": 80
+        }
+      },
+      {
+        "id": "hum_002",
+        "name": "2층 사무실 습도센서",
+        "building_id": "B001",
+        "floor": 2,
+        "room_type": "office",
+        "mqtt_topic": "building/B001/floor2/office/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_002",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 40,
+          "max": 60,
+          "critical_min": 30,
+          "critical_max": 70
+        }
+      },
+      {
+        "id": "hum_003",
+        "name": "1층 출입구 습도센서",
+        "building_id": "B002",
+        "floor": 1,
+        "room_type": "entrance",
+        "mqtt_topic": "building/B002/floor1/entrance/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_003",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 30,
+          "max": 70,
+          "critical_min": 20,
+          "critical_max": 80
+        }
+      },
+      {
+        "id": "hum_004",
+        "name": "2층 실험실 습도센서",
+        "building_id": "B002",
+        "floor": 2,
+        "room_type": "lab",
+        "mqtt_topic": "building/B002/floor2/lab/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_004",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 40,
+          "max": 60,
+          "critical_min": 30,
+          "critical_max": 70
+        }
+      },
+      {
+        "id": "hum_005",
+        "name": "1층 창고 습도센서",
+        "building_id": "B003",
+        "floor": 1,
+        "room_type": "warehouse",
+        "mqtt_topic": "building/B003/floor1/warehouse/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_005",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 30,
+          "max": 70,
+          "critical_min": 20,
+          "critical_max": 80
+        }
+      },
+      {
+        "id": "hum_006",
+        "name": "2층 생산라인 습도센서",
+        "building_id": "B003",
+        "floor": 2,
+        "room_type": "production_line",
+        "mqtt_topic": "building/B003/floor2/production_line/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_006",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 40,
+          "max": 60,
+          "critical_min": 30,
+          "critical_max": 70
+        }
+      },
+      {
+        "id": "hum_007",
+        "name": "1층 보관구역 습도센서",
+        "building_id": "B004",
+        "floor": 1,
+        "room_type": "storage_area",
+        "mqtt_topic": "building/B004/floor1/storage_area/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_007",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 30,
+          "max": 70,
+          "critical_min": 20,
+          "critical_max": 80
+        }
+      },
+      {
+        "id": "hum_008",
+        "name": "2층 냉장보관 습도센서",
+        "building_id": "B004",
+        "floor": 2,
+        "room_type": "cold_storage",
+        "mqtt_topic": "building/B004/floor2/cold_storage/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_008",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 20,
+          "max": 40,
+          "critical_min": 15,
+          "critical_max": 50
+        }
+      },
+      {
+        "id": "hum_009",
+        "name": "1층 접수처 습도센서",
+        "building_id": "B005",
+        "floor": 1,
+        "room_type": "reception",
+        "mqtt_topic": "building/B005/floor1/reception/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_009",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 30,
+          "max": 70,
+          "critical_min": 20,
+          "critical_max": 80
+        }
+      },
+      {
+        "id": "hum_010",
+        "name": "2층 오픈오피스 습도센서",
+        "building_id": "B005",
+        "floor": 2,
+        "room_type": "open_office",
+        "mqtt_topic": "building/B005/floor2/open_office/humidity",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/hum_010",
+        "update_interval": 60,
+        "unit": "percent",
+        "thresholds": {
+          "min": 40,
+          "max": 60,
+          "critical_min": 30,
+          "critical_max": 70
+        }
+      }
+    ],
+    "occupancy_sensors": [
+      {
+        "id": "occ_001",
+        "name": "1층 로비 인원센서",
+        "building_id": "B001",
+        "floor": 1,
+        "room_type": "lobby",
+        "mqtt_topic": "building/B001/floor1/lobby/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_001",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 50,
+          "critical_min": 0,
+          "critical_max": 100
+        }
+      },
+      {
+        "id": "occ_002",
+        "name": "2층 사무실 인원센서",
+        "building_id": "B001",
+        "floor": 2,
+        "room_type": "office",
+        "mqtt_topic": "building/B001/floor2/office/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_002",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 20,
+          "critical_min": 0,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "occ_003",
+        "name": "3층 회의실 인원센서",
+        "building_id": "B001",
+        "floor": 3,
+        "room_type": "meeting_room",
+        "mqtt_topic": "building/B001/floor3/meeting/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_003",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 15,
+          "critical_min": 0,
+          "critical_max": 20
+        }
+      },
+      {
+        "id": "occ_004",
+        "name": "1층 출입구 인원센서",
+        "building_id": "B002",
+        "floor": 1,
+        "room_type": "entrance",
+        "mqtt_topic": "building/B002/floor1/entrance/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_004",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 50,
+          "critical_min": 0,
+          "critical_max": 100
+        }
+      },
+      {
+        "id": "occ_005",
+        "name": "2층 실험실 인원센서",
+        "building_id": "B002",
+        "floor": 2,
+        "room_type": "lab",
+        "mqtt_topic": "building/B002/floor2/lab/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_005",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 20,
+          "critical_min": 0,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "occ_006",
+        "name": "3층 클린룸 인원센서",
+        "building_id": "B002",
+        "floor": 3,
+        "room_type": "clean_room",
+        "mqtt_topic": "building/B002/floor3/clean_room/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_006",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 15,
+          "critical_min": 0,
+          "critical_max": 20
+        }
+      },
+      {
+        "id": "occ_007",
+        "name": "1층 창고 인원센서",
+        "building_id": "B003",
+        "floor": 1,
+        "room_type": "warehouse",
+        "mqtt_topic": "building/B003/floor1/warehouse/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_007",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 50,
+          "critical_min": 0,
+          "critical_max": 100
+        }
+      },
+      {
+        "id": "occ_008",
+        "name": "2층 생산라인 인원센서",
+        "building_id": "B003",
+        "floor": 2,
+        "room_type": "production_line",
+        "mqtt_topic": "building/B003/floor2/production_line/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_008",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 20,
+          "critical_min": 0,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "occ_009",
+        "name": "3층 품질관리 인원센서",
+        "building_id": "B003",
+        "floor": 3,
+        "room_type": "quality_control",
+        "mqtt_topic": "building/B003/floor3/quality_control/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_009",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 15,
+          "critical_min": 0,
+          "critical_max": 20
+        }
+      },
+      {
+        "id": "occ_010",
+        "name": "1층 보관구역 인원센서",
+        "building_id": "B004",
+        "floor": 1,
+        "room_type": "storage_area",
+        "mqtt_topic": "building/B004/floor1/storage_area/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_010",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 50,
+          "critical_min": 0,
+          "critical_max": 100
+        }
+      },
+      {
+        "id": "occ_011",
+        "name": "2층 냉장보관 인원센서",
+        "building_id": "B004",
+        "floor": 2,
+        "room_type": "cold_storage",
+        "mqtt_topic": "building/B004/floor2/cold_storage/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_011",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 20,
+          "critical_min": 0,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "occ_012",
+        "name": "3층 하역장 인원센서",
+        "building_id": "B004",
+        "floor": 3,
+        "room_type": "loading_dock",
+        "mqtt_topic": "building/B004/floor3/loading_dock/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_012",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 15,
+          "critical_min": 0,
+          "critical_max": 20
+        }
+      },
+      {
+        "id": "occ_013",
+        "name": "1층 접수처 인원센서",
+        "building_id": "B005",
+        "floor": 1,
+        "room_type": "reception",
+        "mqtt_topic": "building/B005/floor1/reception/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_013",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 50,
+          "critical_min": 0,
+          "critical_max": 100
+        }
+      },
+      {
+        "id": "occ_014",
+        "name": "2층 오픈오피스 인원센서",
+        "building_id": "B005",
+        "floor": 2,
+        "room_type": "open_office",
+        "mqtt_topic": "building/B005/floor2/open_office/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_014",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 20,
+          "critical_min": 0,
+          "critical_max": 30
+        }
+      },
+      {
+        "id": "occ_015",
+        "name": "3층 회의실 인원센서",
+        "building_id": "B005",
+        "floor": 3,
+        "room_type": "conference_room",
+        "mqtt_topic": "building/B005/floor3/conference_room/occupancy",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/occ_015",
+        "update_interval": 30,
+        "unit": "count",
+        "thresholds": {
+          "min": 0,
+          "max": 15,
+          "critical_min": 0,
+          "critical_max": 20
+        }
+      }
+    ],
+    "power_sensors": [
+      {
+        "id": "power_001",
+        "name": "1층 전력소비센서",
+        "building_id": "B001",
+        "floor": 1,
+        "room_type": "lobby",
+        "mqtt_topic": "building/B001/floor1/lobby/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_001",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 100,
+          "critical_min": 0,
+          "critical_max": 150
+        }
+      },
+      {
+        "id": "power_002",
+        "name": "2층 전력소비센서",
+        "building_id": "B001",
+        "floor": 2,
+        "room_type": "office",
+        "mqtt_topic": "building/B001/floor2/office/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_002",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 80,
+          "critical_min": 0,
+          "critical_max": 120
+        }
+      },
+      {
+        "id": "power_003",
+        "name": "3층 전력소비센서",
+        "building_id": "B001",
+        "floor": 3,
+        "room_type": "meeting_room",
+        "mqtt_topic": "building/B001/floor3/meeting/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_003",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 60,
+          "critical_min": 0,
+          "critical_max": 90
+        }
+      },
+      {
+        "id": "power_004",
+        "name": "1층 출입구 전력소비센서",
+        "building_id": "B002",
+        "floor": 1,
+        "room_type": "entrance",
+        "mqtt_topic": "building/B002/floor1/entrance/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_004",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 100,
+          "critical_min": 0,
+          "critical_max": 150
+        }
+      },
+      {
+        "id": "power_005",
+        "name": "2층 실험실 전력소비센서",
+        "building_id": "B002",
+        "floor": 2,
+        "room_type": "lab",
+        "mqtt_topic": "building/B002/floor2/lab/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_005",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 80,
+          "critical_min": 0,
+          "critical_max": 120
+        }
+      },
+      {
+        "id": "power_006",
+        "name": "3층 클린룸 전력소비센서",
+        "building_id": "B002",
+        "floor": 3,
+        "room_type": "clean_room",
+        "mqtt_topic": "building/B002/floor3/clean_room/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_006",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 60,
+          "critical_min": 0,
+          "critical_max": 90
+        }
+      },
+      {
+        "id": "power_007",
+        "name": "1층 창고 전력소비센서",
+        "building_id": "B003",
+        "floor": 1,
+        "room_type": "warehouse",
+        "mqtt_topic": "building/B003/floor1/warehouse/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_007",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 100,
+          "critical_min": 0,
+          "critical_max": 150
+        }
+      },
+      {
+        "id": "power_008",
+        "name": "2층 생산라인 전력소비센서",
+        "building_id": "B003",
+        "floor": 2,
+        "room_type": "production_line",
+        "mqtt_topic": "building/B003/floor2/production_line/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_008",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 80,
+          "critical_min": 0,
+          "critical_max": 120
+        }
+      },
+      {
+        "id": "power_009",
+        "name": "3층 품질관리 전력소비센서",
+        "building_id": "B003",
+        "floor": 3,
+        "room_type": "quality_control",
+        "mqtt_topic": "building/B003/floor3/quality_control/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_009",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 60,
+          "critical_min": 0,
+          "critical_max": 90
+        }
+      },
+      {
+        "id": "power_010",
+        "name": "1층 보관구역 전력소비센서",
+        "building_id": "B004",
+        "floor": 1,
+        "room_type": "storage_area",
+        "mqtt_topic": "building/B004/floor1/storage_area/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_010",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 100,
+          "critical_min": 0,
+          "critical_max": 150
+        }
+      },
+      {
+        "id": "power_011",
+        "name": "2층 냉장보관 전력소비센서",
+        "building_id": "B004",
+        "floor": 2,
+        "room_type": "cold_storage",
+        "mqtt_topic": "building/B004/floor2/cold_storage/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_011",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 120,
+          "critical_min": 0,
+          "critical_max": 180
+        }
+      },
+      {
+        "id": "power_012",
+        "name": "3층 하역장 전력소비센서",
+        "building_id": "B004",
+        "floor": 3,
+        "room_type": "loading_dock",
+        "mqtt_topic": "building/B004/floor3/loading_dock/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_012",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 60,
+          "critical_min": 0,
+          "critical_max": 90
+        }
+      },
+      {
+        "id": "power_013",
+        "name": "1층 접수처 전력소비센서",
+        "building_id": "B005",
+        "floor": 1,
+        "room_type": "reception",
+        "mqtt_topic": "building/B005/floor1/reception/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_013",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 100,
+          "critical_min": 0,
+          "critical_max": 150
+        }
+      },
+      {
+        "id": "power_014",
+        "name": "2층 오픈오피스 전력소비센서",
+        "building_id": "B005",
+        "floor": 2,
+        "room_type": "open_office",
+        "mqtt_topic": "building/B005/floor2/open_office/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_014",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 80,
+          "critical_min": 0,
+          "critical_max": 120
+        }
+      },
+      {
+        "id": "power_015",
+        "name": "3층 회의실 전력소비센서",
+        "building_id": "B005",
+        "floor": 3,
+        "room_type": "conference_room",
+        "mqtt_topic": "building/B005/floor3/conference_room/power",
+        "http_endpoint": "http://sensor-gateway:8080/api/sensors/power_015",
+        "update_interval": 15,
+        "unit": "kwh",
+        "thresholds": {
+          "min": 0,
+          "max": 60,
+          "critical_min": 0,
+          "critical_max": 90
+        }
+      }
+    ]
+  },
+  "mqtt_config": {
+    "broker": "localhost",
+    "port": 1883,
+    "username": "energy_system",
+    "password": "smart_building_2024",
+    "client_id": "energy_management_system",
+    "keepalive": 60,
+    "qos": 1
+  },
+  "http_config": {
+    "timeout": 10,
+    "retry_attempts": 3,
+    "retry_delay": 5
+  },
+  "data_storage": {
+    "database": "sqlite",
+    "file_path": "iot_sensors/sensor_data/sensor_readings.db",
+    "backup_interval": 3600,
+    "retention_days": 30
+  },
+  "alerts": {
+    "email": {
+      "enabled": true,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "energy_system@company.com",
+      "password": "your_password_here",
+      "recipients": ["admin@company.com", "facility@company.com"]
+    },
+    "webhook": {
+      "enabled": true,
+      "url": "http://localhost:5000/api/alerts",
+      "timeout": 5
+    }
+  },
+  "prediction": {
+    "update_interval": 300,
+    "model_path": "models/Tuned_XGBoost.pkl",
+    "scaler_path": "models/scaler.pkl",
+    "confidence_threshold": 0.8
+  }
+}

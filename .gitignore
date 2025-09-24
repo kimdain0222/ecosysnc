@@ -58,18 +58,14 @@ Thumbs.db
 *.log
 logs/
 
-# Data files (if too large)
-*.csv
-*.json
-*.zip
-*.txt
-data/raw/
-data/processed/
-iot_sensors/sensor_data/
+# Data files (keep essential ones, ignore large raw data)
+data/raw/household_power_consumption.txt
+data/raw/household_power_consumption.zip
+iot_sensors/sensor_data/sensor_readings.db
+iot_sensors/sensor_data/*.log
 
-# Model files (if too large)
-*.pkl
-models/*.pkl
+# Model files (keep trained models, ignore temporary ones)
+# *.pkl  # Commented out to keep trained models
 
 # Temporary files
 *.tmp

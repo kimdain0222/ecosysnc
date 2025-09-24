@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-13T21:42:16.566799",
+  "original_shape": [
+    43800,
+    8
+  ],
+  "processed_shape": [
+    43800,
+    83
+  ],
+  "feature_count": 82,
+  "target_column": "power_consumption",
+  "scalers_used": [
+    "numerical"
+  ],
+  "encoders_used": [
+    "building_id",
+    "room_type",
+    "season",
+    "time_period",
+    "temp_category",
+    "occupancy_level",
+    "power_quantile",
+    "power_category"
+  ]
+}

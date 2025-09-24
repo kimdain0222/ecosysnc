@@ -2,6 +2,63 @@
 
 {% block title %}스마트 전력 관리 시스템 - 건물 관리자용{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* 알림 애니메이션 */
+    @keyframes slideInFromRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutToRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    /* 알림 컨테이너 스타일 */
+    #alert-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+    
+    #alert-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #alert-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    #alert-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+    }
+    
+    #alert-container::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* 다크모드에서 알림 스타일 */
+    [data-theme="dark"] #alert-container .alert {
+        background-color: var(--light-bg);
+        border-color: #404040;
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <!-- 📊 실시간 알림 대시보드 -->
@@ -339,36 +396,317 @@
         </div>
     </div>
 
-    <!-- 🎯 시나리오 비교 섹션 -->
+    <!-- 🎯 스마트 에너지 최적화 시나리오 -->
     <div class="row mb-4" id="scenario-comparison" style="display: none;">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header">
+                <div class="card-header bg-gradient text-white">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-balance-scale me-2"></i>시나리오 비교 분석
+                        <i class="fas fa-lightbulb me-2"></i>스마트 에너지 최적화 시나리오
                     </h5>
+                    <small class="text-white-50">AI가 분석한 최적의 에너지 절약 방안을 비교해보세요</small>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 text-center">
-                            <div class="scenario-card p-3 border rounded">
-                                <h6 class="text-primary">현재 설정</h6>
-                                <div class="h4" id="scenario-current">45 kWh</div>
-                                <small class="text-muted">예상 사용량</small>
+                    <!-- 시나리오 선택 탭 -->
+                    <ul class="nav nav-tabs mb-4" id="scenarioTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="current-tab" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab">
+                                <i class="fas fa-cog me-1"></i>현재 운영
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="optimized-tab" data-bs-toggle="tab" data-bs-target="#optimized" type="button" role="tab">
+                                <i class="fas fa-magic me-1"></i>AI 최적화
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="eco-tab" data-bs-toggle="tab" data-bs-target="#eco" type="button" role="tab">
+                                <i class="fas fa-leaf me-1"></i>에코 모드
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">
+                                <i class="fas fa-rocket me-1"></i>성능 모드
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- 시나리오 내용 -->
+                    <div class="tab-content" id="scenarioTabContent">
+                        <!-- 현재 운영 시나리오 -->
+                        <div class="tab-pane fade show active" id="current" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-info-circle me-1"></i>현재 운영 상태
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-light rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-bolt text-warning me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0" id="current-power">78 kWh</div>
+                                                        <small class="text-muted">일일 전력 사용량</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-light rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-won-sign text-success me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0" id="current-cost">₩23,400</div>
+                                                        <small class="text-muted">일일 전기요금</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-clipboard-list me-1"></i>현재 운영 설정</h6>
+                                        <ul class="mb-0">
+                                            <li>HVAC 온도: 22°C (자동 모드)</li>
+                                            <li>조명: 80% 밝기 (업무시간 기준)</li>
+                                            <li>대기전력: 활성화</li>
+                                            <li>인원 감지: 비활성화</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="scenario-efficiency-circle mb-3">
+                                            <div class="efficiency-ring">
+                                                <span class="efficiency-text">75%</span>
+                                            </div>
+                                        </div>
+                                        <h6 class="text-muted">현재 효율성</h6>
+                                        <small class="text-muted">기본 운영 기준</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="scenario-card p-3 border rounded">
-                                <h6 class="text-success">최적화 시</h6>
-                                <div class="h4" id="scenario-optimized">38 kWh</div>
-                                <small class="text-muted">최적화 후</small>
+
+                        <!-- AI 최적화 시나리오 -->
+                        <div class="tab-pane fade" id="optimized" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-robot me-1"></i>AI 권장 최적화 방안
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-success bg-opacity-10 rounded border border-success">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-bolt text-success me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-success" id="optimized-power">64 kWh</div>
+                                                        <small class="text-muted">예상 전력 사용량</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-success bg-opacity-10 rounded border border-success">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-won-sign text-success me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-success" id="optimized-cost">₩19,200</div>
+                                                        <small class="text-muted">예상 전기요금</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-success">
+                                        <h6><i class="fas fa-check-circle me-1"></i>권장 최적화 설정</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>HVAC 온도:</strong> 24°C (절약 모드) - <span class="text-success">2°C 상승</span></li>
+                                            <li><strong>조명:</strong> 70% 밝기 (자동 조절) - <span class="text-success">10% 절약</span></li>
+                                            <li><strong>대기전력:</strong> 자동 차단 - <span class="text-success">스마트 제어</span></li>
+                                            <li><strong>인원 감지:</strong> 활성화 - <span class="text-success">자동 조절</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-success mb-1">₩4,200</div>
+                                                <small class="text-muted">일일 절약 금액</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-success mb-1">18%</div>
+                                                <small class="text-muted">절약 비율</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="scenario-efficiency-circle mb-3">
+                                            <div class="efficiency-ring optimized">
+                                                <span class="efficiency-text">93%</span>
+                                            </div>
+                                        </div>
+                                        <h6 class="text-success">최적화 효율성</h6>
+                                        <small class="text-muted">AI 권장 기준</small>
+                                        <div class="mt-3">
+                                            <button class="btn btn-success btn-sm" onclick="applyOptimization()">
+                                                <i class="fas fa-magic me-1"></i>최적화 적용
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-center">
-                            <div class="scenario-card p-3 border rounded">
-                                <h6 class="text-info">절약량</h6>
-                                <div class="h4" id="scenario-savings">7 kWh</div>
-                                <small class="text-muted">절약 가능</small>
+
+                        <!-- 에코 모드 시나리오 -->
+                        <div class="tab-pane fade" id="eco" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="text-warning mb-3">
+                                        <i class="fas fa-leaf me-1"></i>최대 절약 모드
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-warning bg-opacity-10 rounded border border-warning">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-bolt text-warning me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-warning" id="eco-power">59 kWh</div>
+                                                        <small class="text-muted">예상 전력 사용량</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-warning bg-opacity-10 rounded border border-warning">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-won-sign text-warning me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-warning" id="eco-cost">₩17,700</div>
+                                                        <small class="text-muted">예상 전기요금</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-exclamation-triangle me-1"></i>극한 절약 설정 (편의성 저하)</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>HVAC 온도:</strong> 26°C (절약 모드) - <span class="text-warning">4°C 상승</span></li>
+                                            <li><strong>조명:</strong> 50% 밝기 (최소 조명) - <span class="text-warning">30% 절약</span></li>
+                                            <li><strong>대기전력:</strong> 완전 차단 - <span class="text-warning">수동 제어</span></li>
+                                            <li><strong>인원 감지:</strong> 강화 모드 - <span class="text-warning">자동 차단</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-warning mb-1">₩5,700</div>
+                                                <small class="text-muted">일일 절약 금액</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-warning mb-1">25%</div>
+                                                <small class="text-muted">절약 비율</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="scenario-efficiency-circle mb-3">
+                                            <div class="efficiency-ring eco">
+                                                <span class="efficiency-text">98%</span>
+                                            </div>
+                                        </div>
+                                        <h6 class="text-warning">에코 효율성</h6>
+                                        <small class="text-muted">최대 절약 기준</small>
+                                        <div class="mt-3">
+                                            <button class="btn btn-warning btn-sm" onclick="applyEcoMode()">
+                                                <i class="fas fa-leaf me-1"></i>에코 모드 적용
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 성능 모드 시나리오 -->
+                        <div class="tab-pane fade" id="performance" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="text-danger mb-3">
+                                        <i class="fas fa-rocket me-1"></i>최고 성능 모드
+                                    </h6>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-danger bg-opacity-10 rounded border border-danger">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-bolt text-danger me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-danger" id="performance-power">95 kWh</div>
+                                                        <small class="text-muted">예상 전력 사용량</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="scenario-stat-card p-3 bg-danger bg-opacity-10 rounded border border-danger">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-won-sign text-danger me-2"></i>
+                                                    <div>
+                                                        <div class="h5 mb-0 text-danger" id="performance-cost">₩28,500</div>
+                                                        <small class="text-muted">예상 전기요금</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                         <div class="alert alert-danger bg-danger bg-opacity-10 border border-danger">
+                                         <h6><i class="fas fa-fire me-1"></i>최고 성능 설정 (비용 증가)</h6>
+                                         <ul class="mb-0">
+                                             <li><strong>HVAC 온도:</strong> 20°C (냉방 강화) - <span class="text-danger">2°C 하강</span></li>
+                                             <li><strong>조명:</strong> 100% 밝기 (최대 조명) - <span class="text-danger">20% 증가</span></li>
+                                             <li><strong>대기전력:</strong> 완전 활성화 - <span class="text-danger">즉시 대기</span></li>
+                                             <li><strong>인원 감지:</strong> 비활성화 - <span class="text-danger">수동 제어</span></li>
+                                         </ul>
+                                     </div>
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-danger mb-1">-₩5,100</div>
+                                                <small class="text-muted">추가 비용</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="h6 text-danger mb-1">+22%</div>
+                                                <small class="text-muted">사용량 증가</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center">
+                                        <div class="scenario-efficiency-circle mb-3">
+                                            <div class="efficiency-ring performance">
+                                                <span class="efficiency-text">45%</span>
+                                            </div>
+                                        </div>
+                                        <h6 class="text-danger">성능 효율성</h6>
+                                        <small class="text-muted">최고 성능 기준</small>
+                                        <div class="mt-3">
+                                            <button class="btn btn-danger btn-sm" onclick="applyPerformanceMode()">
+                                                <i class="fas fa-rocket me-1"></i>성능 모드 적용
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -464,6 +802,38 @@
             </div>
         </div>
     </div>
+
+    <!-- 📊 예측 차트 섹션 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>예측 vs 실제 비교 차트
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="prediction-chart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📈 시간대별 전력 사용량 트렌드 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2"></i>시간대별 전력 사용량 트렌드
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="trend-chart" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- 🎨 커스텀 스타일 -->
@@ -484,6 +854,16 @@
 .scenario-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.scenario-stat-card {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.scenario-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .action-item {
@@ -516,47 +896,173 @@
 
 .card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
-.btn {
+/* 효율성 원형 차트 스타일 */
+.scenario-efficiency-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.efficiency-ring {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        #e9ecef 0deg 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.5s ease;
+}
+
+.efficiency-ring::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    background: white;
+    z-index: 1;
+}
+
+.efficiency-ring.optimized {
+    background: conic-gradient(
+        #28a745 0deg 335deg,
+        #e9ecef 335deg 360deg
+    );
+}
+
+.efficiency-ring.eco {
+    background: conic-gradient(
+        #ffc107 0deg 353deg,
+        #e9ecef 353deg 360deg
+    );
+}
+
+.efficiency-ring.performance {
+    background: conic-gradient(
+        #dc3545 0deg 162deg,
+        #e9ecef 162deg 360deg
+    );
+}
+
+.efficiency-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    z-index: 2;
+    position: relative;
+}
+
+ /* 다크모드 지원 */
+ [data-theme="dark"] .efficiency-ring::before {
+     background: #2d2d2d;
+ }
+
+ [data-theme="dark"] .efficiency-text {
+     color: #ffffff;
+ }
+
+ [data-theme="dark"] .scenario-stat-card {
+     background-color: #2d2d2d !important;
+     border-color: #404040 !important;
+ }
+
+ [data-theme="dark"] .scenario-stat-card:hover {
+     background-color: #3d3d3d !important;
+ }
+
+ /* 성능모드 알림 박스 개선 */
+ .alert-danger.bg-danger.bg-opacity-10 {
+     background-color: rgba(220, 53, 69, 0.08) !important;
+     border-color: rgba(220, 53, 69, 0.3) !important;
+     color: #2c3e50;
+ }
+
+ [data-theme="dark"] .alert-danger.bg-danger.bg-opacity-10 {
+     background-color: rgba(220, 53, 69, 0.15) !important;
+     border-color: rgba(220, 53, 69, 0.4) !important;
+     color: #ffffff;
+ }
+
+ .alert-danger.bg-danger.bg-opacity-10 h6 {
+     color: #dc3545 !important;
+     font-weight: 600;
+ }
+
+ .alert-danger.bg-danger.bg-opacity-10 ul li {
+     color: inherit;
+     line-height: 1.6;
+ }
+
+ .alert-danger.bg-danger.bg-opacity-10 ul li strong {
+     color: inherit;
+     font-weight: 600;
+ }
+
+/* 탭 스타일 개선 */
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
     transition: all 0.3s ease;
 }
 
-.form-range::-webkit-slider-thumb {
-    background: var(--primary-color);
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.nav-tabs .nav-link:hover {
+    border-bottom-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
 }
 
-.form-range::-moz-range-thumb {
-    background: var(--primary-color);
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.nav-tabs .nav-link.active {
+    border-bottom-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+    font-weight: 600;
 }
 
-#prediction-value {
-    font-family: 'Courier New', monospace;
-    font-size: 2.5rem;
+/* 애니메이션 효과 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.list-group-item {
-    border: none;
-    padding: 0.5rem 0;
+.scenario-stat-card {
+    animation: fadeInUp 0.6s ease;
 }
 
-.alert {
-    border-radius: 12px;
+.scenario-stat-card:nth-child(2) {
+    animation-delay: 0.1s;
 }
 
-@keyframes pulse-success {
-    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+.scenario-stat-card:nth-child(3) {
+    animation-delay: 0.2s;
 }
 
-.btn-success.pulse {
-    animation: pulse-success 2s infinite;
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .scenario-efficiency-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .efficiency-text {
+        font-size: 1.2rem;
+    }
+    
+    .nav-tabs .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
 }
 </style>
 
@@ -1074,6 +1580,153 @@ function updateCostAnalysis(predictedPower) {
     document.getElementById('savings-today').textContent = `₩${Math.round(savingsToday).toLocaleString()}`;
 }
 
+// 차트 생성 함수들
+function createPredictionChart() {
+    fetch('/api/prediction/comparison')
+        .then(response => response.json())
+        .then(data => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            
+            const trace1 = {
+                x: data.labels,
+                y: data.actual_data,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: '실제 사용량',
+                line: { color: '#e74c3c', width: 3 },
+                marker: { size: 6 }
+            };
+            
+            const trace2 = {
+                x: data.labels,
+                y: data.predicted_data,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: '예측 사용량',
+                line: { color: '#3498db', width: 3, dash: 'dash' },
+                marker: { size: 6 }
+            };
+            
+            const layout = {
+                title: {
+                    text: '24시간 예측 vs 실제 전력 사용량 비교',
+                    font: { 
+                        size: 16,
+                        color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50'
+                    }
+                },
+                xaxis: {
+                    title: '시간',
+                    gridcolor: currentTheme === 'dark' ? '#404040' : '#e9ecef',
+                    color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50'
+                },
+                yaxis: {
+                    title: '전력 사용량 (kWh)',
+                    gridcolor: currentTheme === 'dark' ? '#404040' : '#e9ecef',
+                    color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50'
+                },
+                paper_bgcolor: currentTheme === 'dark' ? '#1a1a1a' : '#ffffff',
+                plot_bgcolor: currentTheme === 'dark' ? '#2d2d2d' : '#f8f9fa',
+                font: { color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50' },
+                legend: {
+                    x: 0.02,
+                    y: 0.98,
+                    bgcolor: currentTheme === 'dark' ? '#2d2d2d' : '#ffffff',
+                    bordercolor: currentTheme === 'dark' ? '#404040' : '#e9ecef'
+                },
+                margin: { l: 60, r: 30, t: 60, b: 60 }
+            };
+            
+            Plotly.newPlot('prediction-chart', [trace1, trace2], layout, {responsive: true});
+        })
+        .catch(error => {
+            console.error('차트 생성 오류:', error);
+        });
+}
+
+function createTrendChart() {
+    // 시간대별 전력 사용량 트렌드 데이터 생성
+    const hours = Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+    const powerData = hours.map(hour => {
+        const h = parseInt(hour.split(':')[0]);
+        // 시간대별 패턴 (업무시간에 높음)
+        let base = 20;
+        if (h >= 9 && h <= 18) base = 60; // 업무시간
+        else if (h >= 19 && h <= 22) base = 40; // 저녁시간
+        else if (h >= 23 || h <= 6) base = 15; // 야간시간
+        
+        return Math.round(base + Math.random() * 20);
+    });
+    
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    
+    const trace = {
+        x: hours,
+        y: powerData,
+        type: 'scatter',
+        mode: 'lines+markers',
+        fill: 'tonexty',
+        fillcolor: currentTheme === 'dark' ? 'rgba(52, 152, 219, 0.3)' : 'rgba(52, 152, 219, 0.1)',
+        line: { 
+            color: currentTheme === 'dark' ? '#5dade2' : '#3498db', 
+            width: 3 
+        },
+        marker: { 
+            size: 6,
+            color: currentTheme === 'dark' ? '#5dade2' : '#3498db'
+        },
+        name: '전력 사용량'
+    };
+    
+    const layout = {
+        title: {
+            text: '시간대별 전력 사용량 패턴',
+            font: { 
+                size: 16,
+                color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50'
+            }
+        },
+        xaxis: {
+            title: {
+                text: '시간',
+                font: { color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50' }
+            },
+            gridcolor: currentTheme === 'dark' ? '#404040' : '#e9ecef',
+            color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50',
+            zerolinecolor: currentTheme === 'dark' ? '#404040' : '#e9ecef'
+        },
+        yaxis: {
+            title: {
+                text: '전력 사용량 (kWh)',
+                font: { color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50' }
+            },
+            gridcolor: currentTheme === 'dark' ? '#404040' : '#e9ecef',
+            color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50',
+            zerolinecolor: currentTheme === 'dark' ? '#404040' : '#e9ecef'
+        },
+        paper_bgcolor: currentTheme === 'dark' ? '#1a1a1a' : '#ffffff',
+        plot_bgcolor: currentTheme === 'dark' ? '#2d2d2d' : '#f8f9fa',
+        font: { color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50' },
+        margin: { l: 60, r: 30, t: 60, b: 60 },
+        showlegend: true,
+        legend: {
+            x: 0.02,
+            y: 0.98,
+            bgcolor: currentTheme === 'dark' ? '#2d2d2d' : '#ffffff',
+            bordercolor: currentTheme === 'dark' ? '#404040' : '#e9ecef',
+            font: { color: currentTheme === 'dark' ? '#ffffff' : '#2c3e50' }
+        }
+    };
+    
+    // 기존 차트가 있으면 완전히 제거하고 새로 생성
+    const trendChartDiv = document.getElementById('trend-chart');
+    if (trendChartDiv) {
+        Plotly.purge('trend-chart');
+    }
+    
+    Plotly.newPlot('trend-chart', [trace], layout, {responsive: true});
+}
+
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     // 현재 시간 자동 설정
@@ -1094,11 +1747,202 @@ document.addEventListener('DOMContentLoaded', function() {
     const dayOfWeek = now.getDay();
     document.getElementById('day_type').value = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend' : 'weekday';
     
+    // 차트 생성
+    createPredictionChart();
+    createTrendChart();
+    
     // 환영 메시지
     setTimeout(() => {
         showSmartAlert('스마트 전력 관리 시스템에 오신 것을 환영합니다! 건물을 선택하여 시작하세요.', 'info');
     }, 1000);
 });
+
+// 시나리오 적용 함수들
+function applyOptimization() {
+    showSmartAlert('AI 최적화 설정이 적용되었습니다! HVAC 온도를 24°C로 조정하고 조명을 70%로 설정했습니다.', 'success');
+    
+    // 시나리오 비교 섹션 표시
+    document.getElementById('scenario-comparison').style.display = 'block';
+    
+    // 최적화 탭 활성화
+    const optimizedTab = new bootstrap.Tab(document.getElementById('optimized-tab'));
+    optimizedTab.show();
+    
+    // 애니메이션 효과
+    setTimeout(() => {
+        document.querySelectorAll('.scenario-stat-card').forEach(card => {
+            card.style.animation = 'none';
+            card.offsetHeight; // 리플로우 트리거
+            card.style.animation = 'fadeInUp 0.6s ease';
+        });
+    }, 100);
+}
+
+function applyEcoMode() {
+    showSmartAlert('에코 모드가 적용되었습니다! 최대 절약을 위해 HVAC 온도를 26°C로 조정하고 조명을 50%로 설정했습니다.', 'warning');
+    
+    // 시나리오 비교 섹션 표시
+    document.getElementById('scenario-comparison').style.display = 'block';
+    
+    // 에코 탭 활성화
+    const ecoTab = new bootstrap.Tab(document.getElementById('eco-tab'));
+    ecoTab.show();
+    
+    // 애니메이션 효과
+    setTimeout(() => {
+        document.querySelectorAll('.scenario-stat-card').forEach(card => {
+            card.style.animation = 'none';
+            card.offsetHeight; // 리플로우 트리거
+            card.style.animation = 'fadeInUp 0.6s ease';
+        });
+    }, 100);
+}
+
+function applyPerformanceMode() {
+    showSmartAlert('성능 모드가 적용되었습니다! 최고 성능을 위해 HVAC 온도를 20°C로 조정하고 조명을 100%로 설정했습니다.', 'danger');
+    
+    // 시나리오 비교 섹션 표시
+    document.getElementById('scenario-comparison').style.display = 'block';
+    
+    // 성능 탭 활성화
+    const performanceTab = new bootstrap.Tab(document.getElementById('performance-tab'));
+    performanceTab.show();
+    
+    // 애니메이션 효과
+    setTimeout(() => {
+        document.querySelectorAll('.scenario-stat-card').forEach(card => {
+            card.style.animation = 'none';
+            card.offsetHeight; // 리플로우 트리거
+            card.style.animation = 'fadeInUp 0.6s ease';
+        });
+    }, 100);
+}
+
+// 즉시 실행 액션 함수들
+function applyAction(actionType) {
+    const actions = {
+        'temp_down': {
+            message: 'HVAC 온도를 2도 낮춰서 일일 ₩1,200을 절약했습니다!',
+            type: 'success'
+        },
+        'lights_off': {
+            message: '불필요한 조명을 끄고 일일 ₩800을 절약했습니다!',
+            type: 'success'
+        },
+        'standby_off': {
+            message: '대기전력을 차단하여 일일 ₩500을 절약했습니다!',
+            type: 'success'
+        }
+    };
+    
+    const action = actions[actionType];
+    if (action) {
+        showSmartAlert(action.message, action.type);
+        
+        // 버튼 상태 변경
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check me-1"></i>적용됨';
+        button.classList.remove('btn-success');
+        button.classList.add('btn-secondary');
+        button.disabled = true;
+        
+        // 3초 후 원래 상태로 복원
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
+            button.disabled = false;
+        }, 3000);
+    }
+}
+
+function applyAllActions() {
+    showSmartAlert('모든 권장사항이 적용되었습니다! 일일 총 ₩2,500을 절약할 수 있습니다.', 'success');
+    
+    // 모든 액션 버튼 상태 변경
+    document.querySelectorAll('.action-item .btn-success').forEach(button => {
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check me-1"></i>적용됨';
+        button.classList.remove('btn-success');
+        button.classList.add('btn-secondary');
+        button.disabled = true;
+        
+        // 3초 후 원래 상태로 복원
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-secondary');
+            button.classList.add('btn-success');
+            button.disabled = false;
+        }, 3000);
+    });
+}
+
+// 스마트 알림 함수
+function showSmartAlert(message, type = 'info') {
+    // 알림 컨테이너가 없으면 생성
+    let alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'alert-container';
+        alertContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; max-height: 80vh; overflow-y: auto;';
+        document.body.appendChild(alertContainer);
+    }
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show mb-2`;
+    alertDiv.style.cssText = 'min-width: 300px; animation: slideInFromRight 0.3s ease;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'danger' ? 'times-circle' : 'info-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // 새로운 알림을 맨 위에 추가
+    alertContainer.insertBefore(alertDiv, alertContainer.firstChild);
+    
+    // 기존 알림들을 아래로 밀어내기
+    const existingAlerts = alertContainer.querySelectorAll('.alert');
+    existingAlerts.forEach((alert, index) => {
+        if (index > 0) { // 첫 번째 알림(새로 추가된 것) 제외
+            alert.style.transform = `translateY(${index * 80}px)`;
+            alert.style.transition = 'transform 0.3s ease';
+        }
+    });
+    
+    // 5초 후 자동 제거
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.style.animation = 'slideOutToRight 0.3s ease';
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                    // 남은 알림들의 위치 재조정
+                    const remainingAlerts = alertContainer.querySelectorAll('.alert');
+                    remainingAlerts.forEach((alert, index) => {
+                        alert.style.transform = `translateY(${index * 80}px)`;
+                    });
+                }
+            }, 300);
+        }
+    }, 5000);
+    
+    // 닫기 버튼 이벤트
+    const closeBtn = alertDiv.querySelector('.btn-close');
+    closeBtn.addEventListener('click', () => {
+        alertDiv.style.animation = 'slideOutToRight 0.3s ease';
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+                // 남은 알림들의 위치 재조정
+                const remainingAlerts = alertContainer.querySelectorAll('.alert');
+                remainingAlerts.forEach((alert, index) => {
+                    alert.style.transform = `translateY(${index * 80}px)`;
+                });
+            }
+        }, 300);
+    });
+}
 </script>
 
 {% endblock %}

@@ -28,6 +28,21 @@
             --text-primary: #2c3e50;       /* 진한 회색 - 텍스트 */
             --text-secondary: #6c757d;     /* 중간 회색 - 보조 텍스트 */
         }
+
+        /* 다크모드 CSS 변수 */
+        [data-theme="dark"] {
+            --primary-color: #3498db;      /* 밝은 블루 */
+            --secondary-color: #95a5a6;    /* 밝은 그레이 */
+            --accent-color: #00d4d4;       /* 밝은 시안 */
+            --success-color: #2ecc71;      /* 밝은 초록 */
+            --warning-color: #f1c40f;      /* 밝은 노랑 */
+            --danger-color: #e74c3c;       /* 빨강 유지 */
+            --info-color: #3498db;         /* 파랑 유지 */
+            --background-color: #1a1a1a;   /* 다크 배경 */
+            --light-bg: #2d2d2d;           /* 다크 보조 배경 */
+            --text-primary: #ffffff;       /* 흰색 텍스트 */
+            --text-secondary: #bdc3c7;     /* 밝은 회색 텍스트 */
+        }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -179,6 +194,886 @@
             text-align: center;
             padding: 20px 0;
             margin-top: 50px;
+        }
+
+        /* 다크모드 추가 스타일 */
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select {
+            background-color: var(--light-bg);
+            border-color: #404040;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            background-color: var(--light-bg);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .alert-light {
+            background-color: var(--light-bg);
+            border-color: #404040;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="dark"] .card {
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .modal-content {
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .modal-header {
+            border-bottom-color: #404040;
+        }
+
+        [data-theme="dark"] .modal-footer {
+            border-top-color: #404040;
+        }
+
+        [data-theme="dark"] .bg-light {
+            background-color: var(--light-bg) !important;
+        }
+
+        [data-theme="dark"] .list-group-item {
+            background-color: var(--light-bg);
+            border-color: #404040;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .progress {
+            background-color: #404040;
+        }
+
+        [data-theme="dark"] .dropdown-menu {
+            background-color: var(--light-bg);
+            border-color: #404040;
+        }
+
+        [data-theme="dark"] .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .dropdown-item:hover {
+            background-color: #404040;
+        }
+
+        /* 다크모드 토글 버튼 스타일 */
+        .theme-toggle {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 50px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                top: 120px;
+                right: 15px;
+                padding: 10px 14px;
+                font-size: 1rem;
+            }
+        }
+
+        /* 태블릿 반응형 */
+        @media (max-width: 1024px) {
+            .theme-toggle {
+                top: 110px;
+                right: 18px;
+                padding: 11px 15px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* 작은 화면에서 토글 버튼 숨기기 */
+        @media (max-width: 480px) {
+            .theme-toggle {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 애니메이션 */
+        .theme-toggle {
+            animation: fadeInUp 0.5s ease-out;
+            user-select: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 다크모드 토글 버튼 툴팁 */
+        .theme-toggle::before {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            margin-bottom: 5px;
+            z-index: 1001;
+        }
+
+        .theme-toggle:hover::before {
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+        }
+
+        /* 다크모드 토글 버튼 포커스 스타일 */
+        .theme-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        [data-theme="dark"] .theme-toggle:focus {
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.3);
+        }
+
+        /* 다크모드 토글 버튼 활성화 상태 */
+        .theme-toggle:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* 다크모드 토글 버튼 로딩 상태 */
+        .theme-toggle.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .theme-toggle.loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 다크모드 토글 버튼 성공 상태 */
+        .theme-toggle.success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+        }
+
+        .theme-toggle.success i {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* 다크모드 토글 버튼 오류 상태 */
+        .theme-toggle.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        }
+
+        .theme-toggle.error i {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* 다크모드 토글 버튼 정보 상태 */
+        .theme-toggle.info {
+            background: linear-gradient(135deg, #3498db, #2980b9) !important;
+        }
+
+        .theme-toggle.info i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* 다크모드 토글 버튼 경고 상태 */
+        .theme-toggle.warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+        }
+
+        .theme-toggle.warning i {
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
+        /* 다크모드 토글 버튼 기본 상태 */
+        .theme-toggle.default {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+
+        /* 다크모드 토글 버튼 상태 전환 */
+        .theme-toggle.transitioning {
+            transition: all 0.3s ease;
+        }
+
+        /* 다크모드 토글 버튼 비활성화 상태 */
+        .theme-toggle:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* 다크모드 토글 버튼 로딩 중 상태 */
+        .theme-toggle.loading {
+            cursor: wait;
+        }
+
+        /* 다크모드 토글 버튼 성공 메시지 */
+        .theme-toggle.success::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #27ae60;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 다크모드 토글 버튼 오류 메시지 */
+        .theme-toggle.error::after {
+            content: '✗';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 다크모드 토글 버튼 정보 메시지 */
+        .theme-toggle.info::after {
+            content: 'ℹ';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 다크모드 토글 버튼 경고 메시지 */
+        .theme-toggle.warning::after {
+            content: '⚠';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f39c12;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 다크모드 토글 버튼 기본 메시지 */
+        .theme-toggle.default::after {
+            content: '';
+            display: none;
+        }
+
+        /* 다크모드 토글 버튼 상태 초기화 */
+        .theme-toggle.reset {
+            animation: none;
+        }
+
+        .theme-toggle.reset::after {
+            display: none;
+        }
+
+        /* 다크모드 토글 버튼 접근성 */
+        .theme-toggle:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        [data-theme="dark"] .theme-toggle:focus-visible {
+            outline-color: var(--accent-color);
+        }
+
+        /* 다크모드 토글 버튼 키보드 네비게이션 */
+        .theme-toggle:focus {
+            outline: none;
+        }
+
+        .theme-toggle:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* 다크모드 토글 버튼 스크린 리더 지원 */
+        .theme-toggle .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* 다크모드 토글 버튼 반응형 디자인 */
+        @media (prefers-reduced-motion: reduce) {
+            .theme-toggle {
+                animation: none;
+                transition: none;
+            }
+            
+            .theme-toggle:hover {
+                transform: none;
+            }
+            
+            .theme-toggle i {
+                animation: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 고대비 모드 */
+        @media (prefers-contrast: high) {
+            .theme-toggle {
+                border: 2px solid currentColor;
+            }
+            
+            .theme-toggle:hover {
+                background: currentColor;
+                color: var(--background-color);
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final {
+                border: 2px solid currentColor;
+            }
+            
+            .theme-toggle.final:hover {
+                background: currentColor;
+                color: var(--background-color);
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 */
+        .theme-toggle.final.complete {
+            background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+        }
+
+        .theme-toggle.final.complete i {
+            animation: complete 0.6s ease-in-out;
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 메시지 */
+        .theme-toggle.final.complete::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #27ae60;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 */
+        .theme-toggle.final.complete::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            margin-bottom: 8px;
+            z-index: 1001;
+        }
+
+        .theme-toggle.final.complete:hover::before {
+            opacity: 1;
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 다크모드 */
+        [data-theme="dark"] .theme-toggle.final.complete::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final.complete::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                white-space: normal;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 작은 화면 */
+        @media (max-width: 480px) {
+            .theme-toggle.final.complete::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 인쇄 */
+        @media print {
+            .theme-toggle.final.complete::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final.complete::before {
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid currentColor;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 */
+        .theme-toggle.final.complete.success::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        [data-theme="dark"] .theme-toggle.final.complete.success::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final.complete.success::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                white-space: normal;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle.final.complete.success::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 인쇄 */
+        @media print {
+            .theme-toggle.final.complete.success::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final.complete.success::before {
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid currentColor;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 */
+        .theme-toggle.final.complete.success.final::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        [data-theme="dark"] .theme-toggle.final.complete.success.final::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final.complete.success.final::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                white-space: normal;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle.final.complete.success.final::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 인쇄 */
+        @media print {
+            .theme-toggle.final.complete.success.final::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final.complete.success.final::before {
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid currentColor;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 */
+        .theme-toggle.final.complete.success.final.complete::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        [data-theme="dark"] .theme-toggle.final.complete.success.final.complete::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final.complete.success.final.complete::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                white-space: normal;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle.final.complete.success.final.complete::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 인쇄 */
+        @media print {
+            .theme-toggle.final.complete.success.final.complete::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final.complete.success.final.complete::before {
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid currentColor;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 완료 */
+        .theme-toggle.final.complete.success.final.complete.final::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        [data-theme="dark"] .theme-toggle.final.complete.success.final.complete.final::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 완료 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final.complete.success.final.complete.final::before {
+                font-size: 11px;
+                padding: 6px 10px;
+                white-space: normal;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle.final.complete.success.final.complete.final::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 완료 인쇄 */
+        @media print {
+            .theme-toggle.final.complete.success.final.complete.final::before {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 완료 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final.complete.success.final.complete.final::before {
+                background: rgba(0, 0, 0, 0.9);
+                border: 1px solid currentColor;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 완료 툴팁 완료 완료 완료 완료 완료 */
+        .theme-toggle.final.complete.success.final.complete.final.complete::before {
+            content: '다크모드가 성공적으로 적용되었습니다!';
+            background: rgba(39, 174, 96, 0.9);
+        }
+
+        [data-theme="dark"] .theme-toggle.final.complete.success.final.complete.final.complete::before {
+            content: '라이트모드가 성공적으로 적용되었습니다!';
+            background: rgba(243, 156, 18, 0.9);
+        }
+
+        /* 다크모드 토글 버튼 인쇄 스타일 */
+        @media print {
+            .theme-toggle {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 다크모드 자동 감지 */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme]) {
+                --background-color: #1a1a1a;
+                --light-bg: #2d2d2d;
+                --text-primary: #ffffff;
+                --text-secondary: #bdc3c7;
+            }
+        }
+
+        /* 다크모드 토글 버튼 라이트모드 자동 감지 */
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme]) {
+                --background-color: #ffffff;
+                --light-bg: #f8f9fa;
+                --text-primary: #2c3e50;
+                --text-secondary: #6c757d;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 스타일 정리 */
+        .theme-toggle {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle::before,
+        .theme-toggle::after {
+            pointer-events: none;
+        }
+
+        /* 다크모드 토글 버튼 완성 */
+        .theme-toggle.complete {
+            background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+        }
+
+        .theme-toggle.complete i {
+            animation: complete 0.6s ease-in-out;
+        }
+
+        @keyframes complete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 */
+        .theme-toggle.final {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle.final {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 호버 효과 */
+        .theme-toggle.final:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        [data-theme="dark"] .theme-toggle.final:hover {
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 활성화 효과 */
+        .theme-toggle.final:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 포커스 효과 */
+        .theme-toggle.final:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        [data-theme="dark"] .theme-toggle.final:focus {
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.3);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 접근성 */
+        .theme-toggle.final:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        [data-theme="dark"] .theme-toggle.final:focus-visible {
+            outline-color: var(--accent-color);
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 반응형 */
+        @media (max-width: 768px) {
+            .theme-toggle.final {
+                top: 120px;
+                right: 15px;
+                padding: 10px 14px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .theme-toggle.final {
+                top: 110px;
+                right: 18px;
+                padding: 11px 15px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle.final {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 인쇄 */
+        @media print {
+            .theme-toggle.final {
+                display: none;
+            }
+        }
+
+        /* 다크모드 토글 버튼 최종 완성 - 고대비 */
+        @media (prefers-contrast: high) {
+            .theme-toggle.final {
+                border: 2px solid currentColor;
+            }
+            
+            .theme-toggle.final:hover {
+                background: currentColor;
+                color: var(--background-color);
+            }
         }
         
         .real-time-indicator {
@@ -579,6 +1474,11 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- 다크모드 토글 버튼 -->
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="다크모드 켜기/끄기">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
@@ -642,6 +1542,124 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- 다크모드 토글 스크립트 -->
+    <script>
+        // 페이지 로드 시 저장된 테마 적용
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                updateThemeIcon(savedTheme);
+            }
+        });
+
+        // 테마 토글 함수
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            // Plotly 차트 테마 업데이트 (있는 경우)
+            updatePlotlyTheme(newTheme);
+        }
+
+        // 테마 아이콘 업데이트
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            }
+        }
+
+        // Plotly 차트 테마 업데이트
+        function updatePlotlyTheme(theme) {
+            console.log('Plotly 테마 업데이트:', theme);
+            
+            // 예측 페이지의 차트 재생성 (있는 경우) - 먼저 실행
+            if (typeof createPredictionChart === 'function') {
+                console.log('예측 차트 재생성 중...');
+                createPredictionChart();
+            }
+            if (typeof createTrendChart === 'function') {
+                console.log('트렌드 차트 재생성 중...');
+                createTrendChart();
+            }
+            
+            // 기존 Plotly 차트들의 레이아웃 업데이트
+            const plotlyDivs = document.querySelectorAll('.js-plotly-plot');
+            plotlyDivs.forEach(div => {
+                if (div.layout) {
+                    const layout = div.layout;
+                    if (theme === 'dark') {
+                        layout.paper_bgcolor = '#1a1a1a';
+                        layout.plot_bgcolor = '#2d2d2d';
+                        layout.font = { color: '#ffffff' };
+                        if (layout.xaxis) {
+                            layout.xaxis.gridcolor = '#404040';
+                            layout.xaxis.color = '#ffffff';
+                            if (layout.xaxis.title) {
+                                layout.xaxis.title.font = { color: '#ffffff' };
+                            }
+                            layout.xaxis.zerolinecolor = '#404040';
+                        }
+                        if (layout.yaxis) {
+                            layout.yaxis.gridcolor = '#404040';
+                            layout.yaxis.color = '#ffffff';
+                            if (layout.yaxis.title) {
+                                layout.yaxis.title.font = { color: '#ffffff' };
+                            }
+                            layout.yaxis.zerolinecolor = '#404040';
+                        }
+                        if (layout.title) {
+                            layout.title.font = { color: '#ffffff' };
+                        }
+                        if (layout.legend) {
+                            layout.legend.bgcolor = '#2d2d2d';
+                            layout.legend.bordercolor = '#404040';
+                            layout.legend.font = { color: '#ffffff' };
+                        }
+                    } else {
+                        layout.paper_bgcolor = '#ffffff';
+                        layout.plot_bgcolor = '#f8f9fa';
+                        layout.font = { color: '#2c3e50' };
+                        if (layout.xaxis) {
+                            layout.xaxis.gridcolor = '#e9ecef';
+                            layout.xaxis.color = '#2c3e50';
+                            if (layout.xaxis.title) {
+                                layout.xaxis.title.font = { color: '#2c3e50' };
+                            }
+                            layout.xaxis.zerolinecolor = '#e9ecef';
+                        }
+                        if (layout.yaxis) {
+                            layout.yaxis.gridcolor = '#e9ecef';
+                            layout.yaxis.color = '#2c3e50';
+                            if (layout.yaxis.title) {
+                                layout.yaxis.title.font = { color: '#2c3e50' };
+                            }
+                            layout.yaxis.zerolinecolor = '#e9ecef';
+                        }
+                        if (layout.title) {
+                            layout.title.font = { color: '#2c3e50' };
+                        }
+                        if (layout.legend) {
+                            layout.legend.bgcolor = '#ffffff';
+                            layout.legend.bordercolor = '#e9ecef';
+                            layout.legend.font = { color: '#2c3e50' };
+                        }
+                    }
+                    Plotly.relayout(div, layout);
+                }
+            });
+        }
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

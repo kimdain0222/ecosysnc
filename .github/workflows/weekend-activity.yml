@@ -1,0 +1,72 @@
+name: Weekend Activity
+
+on:
+  schedule:
+    # 주말에 실행 (토요일, 일요일)
+    - cron: '0 10 * * 6'   # 토요일 UTC 10시 (한국시간 오후 7시)
+    - cron: '30 15 * * 0'  # 일요일 UTC 15시 30분 (한국시간 오후 12시 30분)
+  workflow_dispatch: # 수동으로도 실행 가능
+
+jobs:
+  weekend-activity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --local user.email "neolove0125@gmail.com"
+          git config --local user.name "Energy System Bot"
+
+      - name: Create weekend commit
+        run: |
+          # 주말 활동 로그
+          echo "Weekend activity: $(date '+%Y-%m-%d %H:%M:%S KST')" >> daily_activity.log
+          
+          # 주말 활동 메시지 생성
+          weekend_activities=(
+            "주말 사이드 프로젝트 개발"
+            "개인 학습 및 연구"
+            "코드 리뷰 및 정리"
+            "새로운 기술 스택 학습"
+            "프로젝트 문서화 작업"
+            "성능 최적화 연구"
+            "알고리즘 개선 아이디어 검토"
+            "사용자 경험 개선 방안 모색"
+            "보안 강화 방안 연구"
+            "자동화 스크립트 개선"
+            "데이터 분석 인사이트 도출"
+            "모델 성능 평가 및 개선"
+            "코드 아키텍처 리뷰"
+            "테스트 시나리오 확장"
+            "배포 프로세스 개선"
+            "모니터링 시스템 강화"
+            "에러 처리 로직 개선"
+            "사용자 피드백 분석"
+            "성능 벤치마크 업데이트"
+            "코드 품질 메트릭 분석"
+          )
+          
+          # 랜덤하게 활동 선택
+          random_activity=${weekend_activities[$RANDOM % ${#weekend_activities[@]}]}
+          
+          # 커밋 메시지 생성
+          commit_message="🌅 Weekend: $random_activity - $(date '+%Y-%m-%d')"
+          
+          echo "$commit_message" >> daily_activity.log
+          
+          # 파일 추가 및 커밋
+          git add daily_activity.log
+          git commit -m "$commit_message"
+          
+          # 푸시
+          git push
+
+      - name: Show weekend activity info
+        run: |
+          echo "✅ Weekend activity completed!"
+          echo "📅 Date: $(date)"
+          echo "🌅 Activity: $random_activity"

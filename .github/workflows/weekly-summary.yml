@@ -17,8 +17,8 @@ jobs:
 
       - name: Setup Git
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "neolove0125@gmail.com"
+          git config --local user.name "Energy System Bot"
 
       - name: Create weekly summary
         run: |

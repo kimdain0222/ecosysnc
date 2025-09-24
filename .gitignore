@@ -61,11 +61,13 @@ logs/
 # Data files (keep essential ones, ignore large raw data)
 data/raw/household_power_consumption.txt
 data/raw/household_power_consumption.zip
+data/processed/uci_processed_data.csv  # Large file (106MB)
 iot_sensors/sensor_data/sensor_readings.db
 iot_sensors/sensor_data/*.log
 
 # Model files (keep trained models, ignore temporary ones)
-# *.pkl  # Commented out to keep trained models
+models/Random_Forest.pkl  # Large file (191MB)
+models/*.pkl  # All model files (can be large)
 
 # Temporary files
 *.tmp

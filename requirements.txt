@@ -30,6 +30,13 @@ pydantic==2.5.0
 # Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Time Series Database
+influxdb-client==1.38.0
+
+# Cache & Session
+redis==5.0.1
 
 # Data Collection & API
 requests==2.31.0

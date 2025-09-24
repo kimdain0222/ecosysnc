@@ -7,12 +7,13 @@
 ### 필수 요구사항
 - **Python**: 3.8 이상 (권장: 3.9+)
 - **메모리**: 최소 4GB RAM (권장: 8GB+)
-- **디스크**: 최소 2GB 여유 공간
+- **디스크**: 최소 5GB 여유 공간 (Docker 이미지 포함)
 - **운영체제**: Windows 10+, macOS 10.14+, Ubuntu 18.04+
+- **Docker**: Docker Desktop (데이터베이스용)
 
 ### 선택적 요구사항
 - **GPU**: CUDA 지원 GPU (TensorFlow GPU 가속용)
-- **데이터베이스**: PostgreSQL (대용량 데이터용)
+- **WSL 2**: Windows에서 Docker 최적화용
 
 ## 🚀 빠른 설치 (자동)
 
@@ -32,7 +33,8 @@ python3 install.py
 - Python 버전 확인
 - 가상환경 생성
 - 모든 패키지 설치
-- 실행 스크립트 생성
+- Docker 설치 확인
+- 데이터베이스 연결 테스트
 - 설치 검증
 
 ## 🔧 수동 설치
@@ -71,9 +73,29 @@ pip install -e .
 pip install -e ".[dev]"
 ```
 
-### 4. 설치 검증
+### 4. Docker 설치 및 설정
 ```bash
-python -c "import pandas, numpy, sklearn, flask; print('설치 성공!')"
+# Windows: DOCKER_SETUP.md 참조
+# macOS: Docker Desktop 다운로드 및 설치
+# Linux: docker 설치
+```
+
+### 5. 데이터베이스 시작
+```bash
+# 1단계: 기본 데이터베이스 (PostgreSQL, InfluxDB, Redis)
+python scripts/start_databases.py start stage1
+
+# 또는 Docker Compose 직접 사용
+docker-compose up -d postgres influxdb redis
+```
+
+### 6. 설치 검증
+```bash
+# Python 패키지 확인
+python -c "import pandas, numpy, sklearn, flask; print('Python 패키지 설치 성공!')"
+
+# 데이터베이스 연결 테스트
+python scripts/test_database_connection.py
 ```
 
 ## 🎯 실행 방법
@@ -122,6 +144,9 @@ python app.py
 ### 데이터베이스
 - `sqlalchemy==2.0.23` - ORM
 - `psycopg2-binary==2.9.9` - PostgreSQL 어댑터
+- `alembic==1.13.1` - 데이터베이스 마이그레이션
+- `influxdb-client==1.38.0` - InfluxDB 클라이언트
+- `redis==5.0.1` - Redis 클라이언트
 
 ### IoT 및 통신
 - `paho-mqtt==2.1.0` - MQTT 클라이언트
@@ -191,7 +216,25 @@ pip install tensorflow-cpu
 pip install tensorflow==2.15.0
 ```
 
-#### 5. 가상환경 활성화 실패
+#### 5. Docker 설치 문제
+```bash
+❌ Docker가 설치되어 있지 않습니다.
+```
+**해결방법**: 
+- **Windows**: [DOCKER_SETUP.md](DOCKER_SETUP.md) 참조
+- **macOS**: [Docker Desktop 다운로드](https://www.docker.com/products/docker-desktop)
+- **Linux**: `sudo apt install docker.io docker-compose`
+
+#### 6. 데이터베이스 연결 실패
+```bash
+❌ PostgreSQL/InfluxDB/Redis 연결 실패
+```
+**해결방법**:
+1. Docker Desktop이 실행 중인지 확인
+2. 컨테이너 상태 확인: `docker ps`
+3. 데이터베이스 재시작: `docker-compose restart`
+
+#### 7. 가상환경 활성화 실패
 **Windows**:
 ```bash
 # PowerShell 실행 정책 변경
@@ -215,6 +258,22 @@ chmod +x run.sh
 설치 완료 후 웹 브라우저에서 다음 주소로 접속하세요:
 - **로컬**: http://localhost:5000
 - **네트워크**: http://[서버IP]:5000
+
+## 🗄️ 데이터베이스 관리 도구
+
+### PostgreSQL 관리 (pgAdmin)
+- **URL**: http://localhost:5050
+- **이메일**: admin@energy.com
+- **비밀번호**: energy_password_2024
+
+### InfluxDB 관리
+- **URL**: http://localhost:8086
+- **사용자명**: admin
+- **비밀번호**: energy_password_2024
+
+### Redis 관리
+- **포트**: 6379
+- **비밀번호**: energy_password_2024
 
 ## 📱 IoT 센서 설정
 

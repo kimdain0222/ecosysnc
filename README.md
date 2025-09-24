@@ -14,15 +14,22 @@ AI 기반의 스마트 빌딩 에너지 관리 시스템으로, 건물의 전력
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   프론트엔드    │    │   백엔드 API    │    │   ML 파이프라인 │
-│   (React.js)    │◄──►│   (FastAPI)     │◄──►│   (Python)      │
+│   웹 대시보드    │    │   Flask API     │    │   ML 파이프라인 │
+│   (HTML/CSS)    │◄──►│   (Python)      │◄──►│   (Python)      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   대시보드      │    │   PostgreSQL    │    │   데이터 저장소 │
-│   (차트)        │    │   (데이터베이스) │    │   (CSV/JSON)    │
+│   IoT 센서      │    │   PostgreSQL    │    │   InfluxDB      │
+│   (실시간 데이터) │    │   (메인 DB)     │    │   (시계열 DB)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Redis         │    │   Docker        │    │   모니터링      │
+│   (캐시/세션)    │    │   (컨테이너)     │    │   (Grafana)     │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -38,6 +45,9 @@ energy_sys/
 ├── 🔌 iot_sensors/            # IoT 센서 연동
 ├── 🤖 models/                 # 훈련된 ML 모델
 ├── 📱 templates/              # 웹 템플릿
+├── 🐳 docker-compose.yml      # Docker 컨테이너 설정
+├── 🗄️ database/               # 데이터베이스 초기화 스크립트
+├── ⚙️ config/                 # 설정 파일
 ├── 📦 requirements.txt        # 패키지 목록
 ├── 🚀 install.py              # 자동 설치 스크립트
 └── 📚 INSTALL.md              # 상세 설치 가이드
@@ -102,7 +112,34 @@ pip install -e ".[dev]"
 ### 📚 상세 설치 가이드
 자세한 설치 방법과 문제 해결은 [INSTALL.md](INSTALL.md)를 참조하세요.
 
-### 3. 실행
+### 3. Docker 설치 및 데이터베이스 시작
+
+#### Docker Desktop 설치
+```bash
+# Windows: DOCKER_SETUP.md 참조
+# macOS: Docker Desktop 다운로드
+# Linux: docker 설치
+```
+
+#### 데이터베이스 시작
+```bash
+# 1단계: 기본 데이터베이스 (PostgreSQL, InfluxDB, Redis)
+python scripts/start_databases.py start stage1
+
+# 2단계: 전체 스택 (Elasticsearch, MinIO 포함)
+python scripts/start_databases.py start stage2
+
+# 또는 Docker Compose 직접 사용
+docker-compose up -d postgres influxdb redis
+```
+
+#### 데이터베이스 연결 테스트
+```bash
+# 모든 데이터베이스 연결 상태 확인
+python scripts/test_database_connection.py
+```
+
+### 4. 실행
 
 ```bash
 # 웹 대시보드 실행
@@ -114,6 +151,28 @@ python app.py
 ```
 
 웹 브라우저에서 `http://localhost:5000`으로 접속하여 대시보드를 확인하세요.
+
+## 🗄️ 데이터베이스 시스템
+
+### 1단계: MVP (현재 실행 중)
+- **PostgreSQL** (포트 5432): 메인 비즈니스 데이터
+  - 사용자 정보, 건물 정보, 세입자 정보
+  - 에너지 사용량 기록, 시스템 설정
+- **InfluxDB** (포트 8086): 시계열 센서 데이터
+  - IoT 센서 측정값, 실시간 모니터링
+  - 시간 기반 데이터 분석
+- **Redis** (포트 6379): 캐시 및 세션
+  - 사용자 로그인 세션, 자주 사용되는 데이터 캐시
+
+### 2단계: 성장 (필요시 활성화)
+- **Elasticsearch** (포트 9200): 검색 및 분석
+- **MinIO** (포트 9000): 파일 저장소
+- **Prometheus + Grafana**: 시스템 모니터링
+
+### 데이터베이스 관리 도구
+- **pgAdmin** (포트 5050): PostgreSQL 관리
+- **InfluxDB UI** (포트 8086): 시계열 데이터 관리
+- **Grafana** (포트 3000): 대시보드 및 모니터링
 
 ## 📊 데이터 및 모델
 
@@ -131,15 +190,19 @@ python app.py
 
 - **Backend**: Python, Flask, FastAPI
 - **ML/AI**: scikit-learn, XGBoost, TensorFlow
+- **데이터베이스**: PostgreSQL, InfluxDB, Redis
+- **컨테이너**: Docker, Docker Compose
 - **데이터**: pandas, numpy, matplotlib, plotly
 - **IoT**: MQTT, 센서 데이터 수집
 - **웹**: HTML, CSS, JavaScript, Bootstrap
+- **모니터링**: Prometheus, Grafana
 
 ## 📈 성과
 
 - **예측 정확도**: 85% 이상
 - **에너지 절약**: 20-30% 절감 시뮬레이션
 - **실시간 모니터링**: 1초 이내 응답
+- **확장성**: Docker 기반으로 무한 확장 가능
 
 ## 🌱 GitHub 잔디밭
 

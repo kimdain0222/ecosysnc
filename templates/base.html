@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}스마트 빌딩 에너지 관리 시스템{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2980b9;      /* 코발트 블루 - 메인 */
+            --secondary-color: #7f8c8d;    /* 미드 그레이 - 서브 */
+            --accent-color: #00cec9;       /* 시안 - 포인트 */
+            --success-color: #27ae60;      /* 전력사용량 초록 - 유지 */
+            --warning-color: #f39c12;      /* 전력사용량 노랑 - 유지 */
+            --danger-color: #e74c3c;       /* 전력사용량 빨강 - 유지 */
+            --info-color: #3498db;         /* 전력사용량 파랑 - 유지 */
+            --background-color: #ffffff;   /* 화이트 - 배경 */
+            --light-bg: #f8f9fa;           /* 연한 회색 - 보조 배경 */
+            --text-primary: #2c3e50;       /* 진한 회색 - 텍스트 */
+            --text-secondary: #6c757d;     /* 중간 회색 - 보조 텍스트 */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+            box-shadow: 0 2px 10px rgba(41, 128, 185, 0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            background: var(--background-color);
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            border: none;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--success-color), #2ecc71);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
+        }
+        
+        .stat-card.danger {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            border-radius: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 206, 201, 0.25);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: var(--background-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .prediction-result {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: var(--accent-color);
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        
+        .real-time-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        .alert-info {
+            background-color: rgba(0, 206, 201, 0.1);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+        
+        .alert-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-color: var(--warning-color);
+            color: var(--text-primary);
+        }
+        
+        .alert-success {
+            background-color: rgba(39, 174, 96, 0.1);
+            border-color: var(--success-color);
+            color: var(--text-primary);
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--danger-color) !important;
+        }
+        
+        .bg-info {
+            background-color: var(--info-color) !important;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* 센서 값 스타일 */
+        .sensor-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        /* 전력 사용량 상태 표시 색상 - 유지 */
+        .power-status-low { color: var(--info-color); }
+        .power-status-normal { color: var(--success-color); }
+        .power-status-high { color: var(--warning-color); }
+        .power-status-critical { color: var(--danger-color); }
+        
+        /* 추가 스타일 개선 */
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+        }
+        
+        .display-4 {
+            color: var(--primary-color);
+        }
+        
+        .lead {
+            color: var(--text-secondary);
+        }
+        
+        /* 건물 카드 스타일 */
+        .building-card {
+            background: var(--background-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .building-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .building-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .building-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .building-status {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .building-status.success {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+        
+        .building-status.warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .building-status.danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .floor-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .floor-item:last-child {
+            border-bottom: none;
+        }
+        
+        .floor-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .floor-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        /* 테이블 스타일 개선 */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(0, 206, 201, 0.05);
+        }
+        
+        /* 리스트 그룹 스타일 */
+        .list-group-item {
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            background-color: rgba(0, 206, 201, 0.05);
+            transform: translateX(5px);
+        }
+        
+        /* 프로그레스 바 스타일 */
+        .progress {
+            height: 20px;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 20px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 큰 프로그레스 바 (예측 결과용) */
+        .progress-lg {
+            height: 30px;
+            border-radius: 20px;
+        }
+        
+        .progress-lg .progress-bar {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 30px;
+        }
+        
+        /* 중간 프로그레스 바 */
+        .progress-md {
+            height: 25px;
+            border-radius: 18px;
+        }
+        
+        .progress-md .progress-bar {
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 25px;
+        }
+        
+        /* 배지 스타일 */
+        .badge {
+            border-radius: 15px;
+            font-weight: 500;
+        }
+        
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+        }
+        
+        /* 모달 스타일 */
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+        
+        /* 툴팁 스타일 */
+        .tooltip-inner {
+            background-color: var(--text-primary);
+            border-radius: 8px;
+        }
+        
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        }
+        
+        /* 모바일 반응형 최적화 */
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 0.75rem;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .btn-group .btn {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
+            .h3, h3 {
+                font-size: 1.5rem;
+            }
+            
+            .display-4 {
+                font-size: 2rem;
+            }
+            
+            .sensor-card {
+                margin-bottom: 0.5rem;
+            }
+            
+            .progress-lg {
+                height: 20px;
+            }
+            
+            .action-item {
+                margin-bottom: 0.75rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-group .btn {
+                border-radius: 0.375rem !important;
+                margin-bottom: 0.25rem;
+            }
+            
+            .col-md-4 {
+                text-align: center;
+            }
+            
+            .scenario-card {
+                margin-bottom: 1rem;
+            }
+            
+            .prediction-result {
+                font-size: 1.5rem;
+            }
+            
+            .card-header h5 {
+                font-size: 1rem;
+            }
+            
+            .h4, h4 {
+                font-size: 1.25rem;
+            }
+        }
+        
+        /* 터치 친화적 버튼 */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+            }
+            
+            .form-range {
+                height: 1.5rem;
+            }
+            
+            .form-range::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .card:hover {
+                transform: none;
+            }
+            
+            .list-group-item:hover {
+                transform: none;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-building me-2"></i>
+                SBEMS
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>홈
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i>대시보드
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">
+                            <i class="fas fa-chart-bar me-1"></i>분석
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'prediction' %}active{% endif %}" href="{{ url_for('prediction') }}">
+                            <i class="fas fa-crystal-ball me-1"></i>예측
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'iot_monitoring' %}active{% endif %}" href="{{ url_for('iot_monitoring') }}">
+                            <i class="fas fa-sensor me-1"></i>IoT 센서
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-copyright me-1"></i>
+                2024 스마트 빌딩 에너지 관리 시스템 (SBEMS)
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}홈 - 스마트 빌딩 에너지 관리 시스템{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card text-center py-5">
+                <div class="card-body">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-building text-primary me-3"></i>
+                        스마트 빌딩 에너지 관리 시스템
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        AI 기반 실시간 에너지 모니터링 및 예측 시스템으로 건물의 에너지 효율성을 극대화하세요
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>대시보드 보기
+                        </a>
+                        <a href="{{ url_for('prediction') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-crystal-ball me-2"></i>예측 시작
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">주요 기능</h2>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-line text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">실시간 모니터링</h5>
+                    <p class="card-text">건물의 전력 사용량, 온도, 습도, 공실률을 실시간으로 모니터링합니다.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-brain text-success mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">AI 예측</h5>
+                    <p class="card-text">머신러닝 모델을 활용하여 미래 전력 사용량을 정확하게 예측합니다.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-bar text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">데이터 분석</h5>
+                    <p class="card-text">상세한 분석 차트와 통계를 통해 에너지 사용 패턴을 파악합니다.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-leaf text-info mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">에너지 절약</h5>
+                    <p class="card-text">최적화된 제어 시스템으로 에너지 사용량을 최대 30%까지 절약합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">시스템 현황</h2>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-building mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title" id="total-buildings">5</h3>
+                    <p class="card-text">관리 건물 수</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card success text-center">
+                <div class="card-body">
+                    <i class="fas fa-bolt mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title" id="avg-power">0</h3>
+                    <p class="card-text">평균 전력 사용량 (kWh)</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card warning text-center">
+                <div class="card-body">
+                    <i class="fas fa-percentage mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title" id="accuracy">96%</h3>
+                    <p class="card-text">예측 정확도</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card danger text-center">
+                <div class="card-body">
+                    <i class="fas fa-clock mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title" id="update-time">실시간</h3>
+                    <p class="card-text">데이터 업데이트</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">빠른 시작</h2>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-tachometer-alt text-primary mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">실시간 대시보드</h5>
+                    <p class="card-text">현재 건물의 에너지 사용 현황을 한눈에 확인하세요.</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-crystal-ball text-success mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">전력 사용량 예측</h5>
+                    <p class="card-text">AI 모델을 활용하여 미래 전력 사용량을 예측해보세요.</p>
+                    <a href="{{ url_for('prediction') }}" class="btn btn-success">
+                        <i class="fas fa-arrow-right me-2"></i>바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-bar text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="card-title">상세 분석</h5>
+                    <p class="card-text">모델 성능과 특성 중요도를 분석해보세요.</p>
+                    <a href="{{ url_for('analytics') }}" class="btn btn-warning">
+                        <i class="fas fa-arrow-right me-2"></i>바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 페이지 로드 시 통계 데이터 가져오기
+$(document).ready(function() {
+    loadStats();
+    
+    // 30초마다 데이터 업데이트
+    setInterval(loadStats, 30000);
+});
+
+// 전력 사용량 색상 기준 함수
+function getPowerColor(power) {
+    if (power <= 10) {
+        return 'text-primary'; // 파란색 (낮음)
+    } else if (power <= 30) {
+        return 'text-success'; // 초록색 (매우 낮음)
+    } else if (power <= 60) {
+        return 'text-warning'; // 노란색 (보통)
+    } else {
+        return 'text-danger'; // 빨간색 (높음/매우 높음)
+    }
+}
+
+function loadStats() {
+    $.ajax({
+        url: '/api/stats',
+        method: 'GET',
+        success: function(data) {
+            if (data.overall) {
+                const avgPower = Math.round(data.overall.avg_power);
+                const powerColor = getPowerColor(avgPower);
+                $('#avg-power').text(avgPower + ' kWh').removeClass().addClass('card-title ' + powerColor);
+                $('#total-buildings').text(data.overall.total_records > 0 ? 5 : 0);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log('통계 데이터 로드 실패:', error);
+        }
+    });
+    
+    // 실시간 업데이트 시간 표시
+    $('#update-time').html('<span class="real-time-indicator"></span>실시간');
+}
+</script>
+{% endblock %}

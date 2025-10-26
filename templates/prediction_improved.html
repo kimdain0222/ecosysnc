@@ -1,0 +1,973 @@
+{% extends "base.html" %}
+
+{% block title %}스마트 전력 관리 시스템 - 건물 관리자용{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 📊 실시간 알림 대시보드 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info border-0 shadow-sm" id="smart-alerts" style="display: none;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-3 fs-4"></i>
+                    <div class="flex-grow-1">
+                        <strong>시스템 알림:</strong> 
+                        <span id="alert-content">현재 전력 사용량이 평균보다 12% 높습니다. 즉시 확인이 필요합니다.</span>
+                    </div>
+                    <button type="button" class="btn-close" onclick="dismissAlert()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚀 빠른 액션 헤더 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="mb-2">
+                                <i class="fas fa-bolt text-primary me-2"></i>
+                                스마트 전력 관리 시스템
+                            </h3>
+                            <p class="text-muted mb-0">실시간 AI 예측으로 효율적인 에너지 관리와 비용 절약을 실현하세요</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-primary btn-sm" onclick="quickPredict()">
+                                    <i class="fas fa-zap me-1"></i>빠른 예측
+                                </button>
+                                <button class="btn btn-success btn-sm" onclick="compareScenarios()">
+                                    <i class="fas fa-chart-line me-1"></i>시나리오 비교
+                                </button>
+                                <button class="btn btn-info btn-sm" onclick="exportReport()">
+                                    <i class="fas fa-download me-1"></i>보고서
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📋 메인 컨텐츠 섹션 -->
+    <div class="row">
+        <!-- 🏢 스마트 건물 선택 -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-building me-2"></i>건물 선택
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="building_id" class="form-label fw-bold">관리 건물</label>
+                        <select class="form-select form-select-lg" id="building_id" name="building_id" required onchange="updateBuildingInfo()">
+                            <option value="">건물을 선택하세요</option>
+                            <option value="B001">🏢 B001 - 본사 건물 (5층)</option>
+                            <option value="B002">🔬 B002 - 연구소 (3층)</option>
+                            <option value="B003">🏭 B003 - 생산공장 (2층)</option>
+                            <option value="B004">📦 B004 - 창고 (1층)</option>
+                            <option value="B005">🏢 B005 - 사무실 (4층)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="building-info" class="alert alert-light" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="building-description"></span>
+                    </div>
+
+                    <!-- 📊 실시간 센서 현황 -->
+                    <div id="sensor-summary" class="mt-3" style="display: none;">
+                        <h6 class="fw-bold mb-3">실시간 현황</h6>
+                        <div class="row text-center">
+                            <div class="col-6 mb-2">
+                                <div class="sensor-card p-2 bg-light rounded">
+                                    <div class="h5 mb-1" id="current-temp">--°C</div>
+                                    <small class="text-muted">온도</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="sensor-card p-2 bg-light rounded">
+                                    <div class="h5 mb-1" id="current-power">--kWh</div>
+                                    <small class="text-muted">전력</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="sensor-card p-2 bg-light rounded">
+                                    <div class="h5 mb-1" id="current-hum">--%</div>
+                                    <small class="text-muted">습도</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="sensor-card p-2 bg-light rounded">
+                                    <div class="h5 mb-1" id="current-occ">--명</div>
+                                    <small class="text-muted">인원</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🔥 스마트 프리셋 -->
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3">스마트 시나리오</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button class="btn btn-outline-primary btn-sm w-100" onclick="setSmartPreset('office')">
+                                    <i class="fas fa-business-time me-1"></i>업무시간
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-danger btn-sm w-100" onclick="setSmartPreset('peak')">
+                                    <i class="fas fa-fire me-1"></i>피크시간
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-info btn-sm w-100" onclick="setSmartPreset('night')">
+                                    <i class="fas fa-moon me-1"></i>야간모드
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-secondary btn-sm w-100" onclick="setSmartPreset('weekend')">
+                                    <i class="fas fa-calendar-week me-1"></i>주말
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline-success btn-sm w-100 mt-2" onclick="useCurrentData()">
+                            <i class="fas fa-sync me-1"></i>현재 데이터 적용
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⚡ 스마트 예측 폼 -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs me-2"></i>예측 설정
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="prediction-form">
+                        <div class="mb-3">
+                            <label for="hour" class="form-label fw-bold">예측 시간</label>
+                            <select class="form-select" id="hour" name="hour" required>
+                                <option value="">시간 선택</option>
+                                {% for h in range(24) %}
+                                <option value="{{ h }}">{{ "%02d"|format(h) }}:00</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                온도 설정 
+                                <span class="badge bg-primary" id="temp-badge">22°C</span>
+                            </label>
+                            <input type="range" class="form-range" id="temperature" name="temperature" 
+                                   min="15" max="30" value="22" oninput="updateTempValue(this.value)">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">15°C</small>
+                                <small class="text-muted">30°C</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                습도 설정 
+                                <span class="badge bg-info" id="hum-badge">50%</span>
+                            </label>
+                            <input type="range" class="form-range" id="humidity" name="humidity" 
+                                   min="30" max="80" value="50" oninput="updateHumValue(this.value)">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">30%</small>
+                                <small class="text-muted">80%</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                공실률 
+                                <span class="badge bg-warning" id="occ-badge">30%</span>
+                            </label>
+                            <input type="range" class="form-range" id="occupancy" name="occupancy" 
+                                   min="0" max="100" value="30" oninput="updateOccValue(this.value)">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">0%</small>
+                                <small class="text-muted">100%</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="season" class="form-label fw-bold">계절</label>
+                                <select class="form-select" id="season" name="season">
+                                    <option value="spring">봄</option>
+                                    <option value="summer" selected>여름</option>
+                                    <option value="autumn">가을</option>
+                                    <option value="winter">겨울</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="day_type" class="form-label fw-bold">요일</label>
+                                <select class="form-select" id="day_type" name="day_type">
+                                    <option value="weekday" selected>평일</option>
+                                    <option value="weekend">주말</option>
+                                    <option value="holiday">공휴일</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">
+                            <i class="fas fa-magic me-2"></i>
+                            AI 예측 실행
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📈 예측 결과 & 실행 가능한 권장사항 -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>예측 결과 & 권장사항
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- 로딩 상태 -->
+                    <div id="loading" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted">AI가 최적의 예측을 계산 중입니다...</p>
+                    </div>
+
+                    <!-- 예측 결과 -->
+                    <div id="prediction-result" style="display: none;">
+                        <div class="text-center mb-4">
+                            <h4>예상 전력 사용량</h4>
+                            <div id="prediction-value" class="display-4 fw-bold mb-2">--</div>
+                            <div id="prediction-level" class="mb-3"></div>
+                        </div>
+
+                        <!-- 효율성 점수 -->
+                        <div class="card bg-light mb-3">
+                            <div class="card-body text-center py-3">
+                                <h6 class="card-title mb-2">에너지 효율성</h6>
+                                <div class="progress progress-lg mb-2">
+                                    <div class="progress-bar bg-success" id="efficiency-bar" style="width: 75%">75%</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted">현재 효율성</small>
+                                        <div class="h6" id="efficiency-percentage">75%</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">효율 등급</small>
+                                        <div class="h6" id="efficiency-grade">B+</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 절약 가능량 -->
+                        <div class="card bg-light mb-3">
+                            <div class="card-body text-center py-3">
+                                <h6 class="card-title mb-2">절약 가능량</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div id="savings-power" class="h5 text-success">8.2 kWh</div>
+                                        <small class="text-muted">전력량</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div id="savings-cost" class="h5 text-success">₩1,230</div>
+                                        <small class="text-muted">비용</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 실행 가능한 권장사항 -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>즉시 실행 가능한 권장사항</h6>
+                            <div id="recommendations" class="list-group list-group-flush">
+                                <!-- 권장사항이 동적으로 추가됨 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 오류 상태 -->
+                    <div id="error-message" class="alert alert-danger" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="error-text">예측 중 오류가 발생했습니다.</span>
+                    </div>
+
+                    <!-- 초기 상태 -->
+                    <div id="initial-state" class="text-center py-5 text-muted">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <h5>AI 예측 결과가 여기에 표시됩니다</h5>
+                        <p>건물을 선택하고 조건을 설정한 후 예측을 실행하세요</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 시나리오 비교 섹션 -->
+    <div class="row mb-4" id="scenario-comparison" style="display: none;">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>시나리오 비교 분석
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="scenario-card p-3 border rounded">
+                                <h6 class="text-primary">현재 설정</h6>
+                                <div class="h4" id="scenario-current">45 kWh</div>
+                                <small class="text-muted">예상 사용량</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="scenario-card p-3 border rounded">
+                                <h6 class="text-success">최적화 시</h6>
+                                <div class="h4" id="scenario-optimized">38 kWh</div>
+                                <small class="text-muted">최적화 후</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="scenario-card p-3 border rounded">
+                                <h6 class="text-info">절약량</h6>
+                                <div class="h4" id="scenario-savings">7 kWh</div>
+                                <small class="text-muted">절약 가능</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💰 실시간 비용 분석 -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-won-sign me-2"></i>실시간 비용 분석
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="h3 text-success" id="daily-cost">₩12,450</div>
+                            <small class="text-muted">오늘 예상 비용</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="h3 text-primary" id="monthly-cost">₩373,500</div>
+                            <small class="text-muted">이달 예상 비용</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="h3 text-warning" id="savings-today">₩2,180</div>
+                            <small class="text-muted">오늘 절약 가능</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="h3 text-info" id="efficiency-ratio">85%</div>
+                            <small class="text-muted">효율성 비율</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h6 class="fw-bold mb-2">월간 절약 목표</h6>
+                        <div class="progress progress-lg mb-2">
+                            <div class="progress-bar bg-success" id="monthly-goal" style="width: 68%">68% 달성</div>
+                        </div>
+                        <small class="text-muted">목표: ₩50,000 절약 / 달성: ₩34,000</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>즉시 실행 액션
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="action-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">🌡️ 온도 2도 낮추기</h6>
+                                <small class="text-muted">예상 절약: ₩1,200/일</small>
+                            </div>
+                            <button class="btn btn-sm btn-success" onclick="applyAction('temp_down')">실행</button>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">💡 불필요한 조명 끄기</h6>
+                                <small class="text-muted">예상 절약: ₩800/일</small>
+                            </div>
+                            <button class="btn btn-sm btn-success" onclick="applyAction('lights_off')">실행</button>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">⚡ 대기전력 차단</h6>
+                                <small class="text-muted">예상 절약: ₩500/일</small>
+                            </div>
+                            <button class="btn btn-sm btn-success" onclick="applyAction('standby_off')">실행</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-primary w-100" onclick="applyAllActions()">
+                            <i class="fas fa-magic me-1"></i>모든 권장사항 한번에 적용
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🎨 커스텀 스타일 -->
+<style>
+.sensor-card {
+    transition: all 0.3s ease;
+}
+
+.sensor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.scenario-card {
+    transition: all 0.3s ease;
+}
+
+.scenario-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.action-item {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.action-item:hover {
+    border-color: #007bff;
+    transform: translateY(-1px);
+}
+
+.progress-lg {
+    height: 25px;
+}
+
+.progress-lg .progress-bar {
+    line-height: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--primary-color);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--primary-color);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#prediction-value {
+    font-family: 'Courier New', monospace;
+    font-size: 2.5rem;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.5rem 0;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+@keyframes pulse-success {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.btn-success.pulse {
+    animation: pulse-success 2s infinite;
+}
+</style>
+
+<!-- 🔧 JavaScript 기능 -->
+<script>
+// 건물 데이터
+const buildingData = {
+    'B001': {
+        name: '본사 건물',
+        floors: 5,
+        description: '메인 오피스 건물 - 일반 사무실, 회의실, 로비 포함',
+        sensors: { temp: 24, hum: 52, occ: 45, power: 78 }
+    },
+    'B002': {
+        name: '연구소',
+        description: '연구개발 전용 시설 - 실험실, 클린룸, 분석실 포함',
+        sensors: { temp: 22, hum: 45, occ: 28, power: 65 }
+    },
+    'B003': {
+        name: '생산공장',
+        description: '제조 및 생산 시설 - 생산라인, 품질관리실 포함',
+        sensors: { temp: 26, hum: 58, occ: 35, power: 125 }
+    },
+    'B004': {
+        name: '창고',
+        description: '물류 및 보관 시설 - 일반창고, 냉장보관실 포함',
+        sensors: { temp: 18, hum: 65, occ: 12, power: 45 }
+    },
+    'B005': {
+        name: '사무실',
+        description: '부서별 사무공간 - 오픈오피스, 개별실, 회의실 포함',
+        sensors: { temp: 23, hum: 50, occ: 52, power: 89 }
+    }
+};
+
+// 실시간 알림 시스템
+function showSmartAlert(message, type = 'info') {
+    const alertsDiv = document.getElementById('smart-alerts');
+    const contentSpan = document.getElementById('alert-content');
+    
+    contentSpan.textContent = message;
+    alertsDiv.className = `alert alert-${type} border-0 shadow-sm`;
+    alertsDiv.style.display = 'block';
+    
+    // 10초 후 자동 숨김
+    setTimeout(() => {
+        if (alertsDiv.style.display !== 'none') {
+            dismissAlert();
+        }
+    }, 10000);
+}
+
+function dismissAlert() {
+    document.getElementById('smart-alerts').style.display = 'none';
+}
+
+// 건물 정보 업데이트
+function updateBuildingInfo() {
+    const buildingId = document.getElementById('building_id').value;
+    const infoDiv = document.getElementById('building-info');
+    const descSpan = document.getElementById('building-description');
+    const sensorDiv = document.getElementById('sensor-summary');
+    
+    if (buildingId && buildingData[buildingId]) {
+        const building = buildingData[buildingId];
+        
+        // 건물 정보 표시
+        descSpan.textContent = building.description;
+        infoDiv.style.display = 'block';
+        
+        // 센서 데이터 표시
+        document.getElementById('current-temp').textContent = `${building.sensors.temp}°C`;
+        document.getElementById('current-power').textContent = `${building.sensors.power}kWh`;
+        document.getElementById('current-hum').textContent = `${building.sensors.hum}%`;
+        document.getElementById('current-occ').textContent = `${building.sensors.occ}명`;
+        sensorDiv.style.display = 'block';
+        
+        // 자동으로 현재 시간 설정
+        const now = new Date();
+        document.getElementById('hour').value = now.getHours();
+        
+        // 스마트 알림 표시
+        if (building.sensors.power > 100) {
+            showSmartAlert(`${building.name}의 전력 사용량이 평균보다 높습니다. 즉시 확인하세요!`, 'warning');
+        } else {
+            showSmartAlert(`${building.name} 선택됨. 현재 전력 사용량은 정상 범위입니다.`, 'success');
+        }
+    } else {
+        infoDiv.style.display = 'none';
+        sensorDiv.style.display = 'none';
+    }
+}
+
+// 스마트 프리셋 설정
+function setSmartPreset(type) {
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    const presets = {
+        'office': { hour: 14, temp: 24, hum: 50, occ: 20 },
+        'peak': { hour: 18, temp: 26, hum: 60, occ: 10 },
+        'night': { hour: 2, temp: 20, hum: 45, occ: 80 },
+        'weekend': { hour: 12, temp: 22, hum: 55, occ: 60 }
+    };
+    
+    const preset = presets[type];
+    if (preset) {
+        document.getElementById('hour').value = preset.hour;
+        document.getElementById('temperature').value = preset.temp;
+        document.getElementById('humidity').value = preset.hum;
+        document.getElementById('occupancy').value = preset.occ;
+        
+        updateTempValue(preset.temp);
+        updateHumValue(preset.hum);
+        updateOccValue(preset.occ);
+        
+        showSmartAlert(`${type === 'office' ? '업무시간' : type === 'peak' ? '피크시간' : type === 'night' ? '야간모드' : '주말'} 프리셋이 적용되었습니다.`, 'success');
+    }
+}
+
+// 현재 데이터 사용
+function useCurrentData() {
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    const building = buildingData[buildingId];
+    if (building) {
+        document.getElementById('temperature').value = building.sensors.temp;
+        document.getElementById('humidity').value = building.sensors.hum;
+        document.getElementById('occupancy').value = Math.round((building.sensors.occ / 60) * 100);
+        
+        updateTempValue(building.sensors.temp);
+        updateHumValue(building.sensors.hum);
+        updateOccValue(Math.round((building.sensors.occ / 60) * 100));
+        
+        // 현재 시간 설정
+        const now = new Date();
+        document.getElementById('hour').value = now.getHours();
+        
+        showSmartAlert('현재 센서 데이터가 예측 조건에 적용되었습니다.', 'success');
+    }
+}
+
+// 값 업데이트 함수들
+function updateTempValue(value) {
+    document.getElementById('temp-badge').textContent = `${value}°C`;
+}
+
+function updateHumValue(value) {
+    document.getElementById('hum-badge').textContent = `${value}%`;
+}
+
+function updateOccValue(value) {
+    document.getElementById('occ-badge').textContent = `${value}%`;
+}
+
+// 빠른 예측
+function quickPredict() {
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    // 현재 데이터로 자동 설정
+    useCurrentData();
+    
+    // 1초 후 예측 실행
+    setTimeout(() => {
+        document.getElementById('prediction-form').dispatchEvent(new Event('submit'));
+    }, 1000);
+    
+    showSmartAlert('빠른 예측을 시작합니다...', 'info');
+}
+
+// 시나리오 비교
+function compareScenarios() {
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    const comparisonDiv = document.getElementById('scenario-comparison');
+    comparisonDiv.style.display = comparisonDiv.style.display === 'none' ? 'block' : 'none';
+    
+    if (comparisonDiv.style.display === 'block') {
+        // 시나리오 데이터 업데이트
+        const building = buildingData[buildingId];
+        const currentPower = building.sensors.power;
+        const optimizedPower = Math.round(currentPower * 0.85);
+        const savings = currentPower - optimizedPower;
+        
+        document.getElementById('scenario-current').textContent = `${currentPower} kWh`;
+        document.getElementById('scenario-optimized').textContent = `${optimizedPower} kWh`;
+        document.getElementById('scenario-savings').textContent = `${savings} kWh`;
+        
+        showSmartAlert('시나리오 비교 분석이 표시되었습니다.', 'info');
+    }
+}
+
+// 보고서 내보내기
+function exportReport() {
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('먼저 건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    // 간단한 보고서 생성 시뮬레이션
+    const building = buildingData[buildingId];
+    const reportData = {
+        building: building.name,
+        timestamp: new Date().toISOString(),
+        power: building.sensors.power,
+        efficiency: 75,
+        savings: Math.round(building.sensors.power * 0.15)
+    };
+    
+    // CSV 형태로 다운로드 시뮬레이션
+    const csvContent = `건물명,시간,전력사용량,효율성,절약가능량
+${reportData.building},${new Date().toLocaleString()},${reportData.power}kWh,${reportData.efficiency}%,${reportData.savings}kWh`;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `energy_report_${buildingId}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showSmartAlert('에너지 보고서가 다운로드되었습니다.', 'success');
+}
+
+// 액션 실행
+function applyAction(actionType) {
+    const actions = {
+        'temp_down': '온도가 2도 낮춰졌습니다.',
+        'lights_off': '불필요한 조명이 꺼졌습니다.',
+        'standby_off': '대기전력이 차단되었습니다.'
+    };
+    
+    const button = event.target;
+    button.disabled = true;
+    button.textContent = '실행됨';
+    button.classList.remove('btn-success');
+    button.classList.add('btn-secondary');
+    
+    showSmartAlert(actions[actionType], 'success');
+}
+
+function applyAllActions() {
+    const buttons = document.querySelectorAll('.action-item .btn-success');
+    buttons.forEach(button => {
+        button.click();
+    });
+    showSmartAlert('모든 권장사항이 적용되었습니다!', 'success');
+}
+
+// 폼 제출 처리
+document.getElementById('prediction-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const buildingId = document.getElementById('building_id').value;
+    if (!buildingId) {
+        showSmartAlert('건물을 선택해주세요!', 'warning');
+        return;
+    }
+    
+    // UI 상태 변경
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('prediction-result').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('initial-state').style.display = 'none';
+    
+    // 폼 데이터 수집
+    const hour = parseInt(document.getElementById('hour').value) || 12;
+    const temp = parseFloat(document.getElementById('temperature').value) || 22;
+    const hum = parseFloat(document.getElementById('humidity').value) || 50;
+    const occ = parseFloat(document.getElementById('occupancy').value) || 30;
+    
+    // 예측 API 호출 시뮬레이션
+    setTimeout(() => {
+        // 실제 예측 로직 (간단한 알고리즘)
+        const building = buildingData[buildingId];
+        let basePower = building.sensors.power;
+        
+        // 온도에 따른 조정
+        if (temp > 25) basePower *= 1.2;
+        else if (temp < 20) basePower *= 1.1;
+        
+        // 습도에 따른 조정
+        if (hum > 60) basePower *= 1.1;
+        
+        // 공실률에 따른 조정
+        basePower *= (1 - occ/100 * 0.3);
+        
+        // 시간에 따른 조정
+        if (hour >= 9 && hour <= 18) basePower *= 1.3;
+        else if (hour >= 19 && hour <= 23) basePower *= 0.8;
+        else basePower *= 0.6;
+        
+        const predictedPower = Math.round(basePower);
+        
+        // 효율성 계산
+        let efficiency = 85;
+        if (predictedPower > 100) efficiency = 60;
+        else if (predictedPower > 80) efficiency = 70;
+        else if (predictedPower > 60) efficiency = 80;
+        
+        // 절약량 계산
+        const savings = Math.round(predictedPower * 0.15);
+        const savingsCost = savings * 150; // kWh당 150원
+        
+        // 결과 표시
+        showPredictionResult({
+            power: predictedPower,
+            efficiency: efficiency,
+            savings: savings,
+            savingsCost: savingsCost
+        });
+        
+        // 실시간 비용 업데이트
+        updateCostAnalysis(predictedPower);
+        
+    }, 2000);
+});
+
+function showPredictionResult(data) {
+    // 전력 사용량 표시
+    document.getElementById('prediction-value').textContent = `${data.power} kWh`;
+    
+    // 레벨 표시
+    let level, levelClass;
+    if (data.power < 50) {
+        level = '낮음';
+        levelClass = 'success';
+    } else if (data.power < 80) {
+        level = '보통';
+        levelClass = 'warning';
+    } else {
+        level = '높음';
+        levelClass = 'danger';
+    }
+    
+    document.getElementById('prediction-level').innerHTML = `<span class="badge bg-${levelClass}">${level}</span>`;
+    
+    // 효율성 표시
+    document.getElementById('efficiency-bar').style.width = `${data.efficiency}%`;
+    document.getElementById('efficiency-bar').textContent = `${data.efficiency}%`;
+    document.getElementById('efficiency-percentage').textContent = `${data.efficiency}%`;
+    
+    // 등급 계산
+    let grade;
+    if (data.efficiency >= 85) grade = 'A+';
+    else if (data.efficiency >= 75) grade = 'A';
+    else if (data.efficiency >= 65) grade = 'B+';
+    else if (data.efficiency >= 55) grade = 'B';
+    else grade = 'C';
+    
+    document.getElementById('efficiency-grade').textContent = grade;
+    
+    // 절약량 표시
+    document.getElementById('savings-power').textContent = `${data.savings} kWh`;
+    document.getElementById('savings-cost').textContent = `₩${data.savingsCost.toLocaleString()}`;
+    
+    // 권장사항 생성
+    const recommendations = [];
+    if (data.power > 80) recommendations.push('에어컨 설정 온도를 1-2도 높여보세요');
+    if (data.efficiency < 70) recommendations.push('불필요한 장비의 전원을 차단하세요');
+    if (data.power > 100) recommendations.push('피크 시간대 사용량을 분산시켜보세요');
+    recommendations.push('LED 조명으로 교체를 검토해보세요');
+    
+    const recDiv = document.getElementById('recommendations');
+    recDiv.innerHTML = recommendations.map(rec => 
+        `<div class="list-group-item d-flex align-items-center">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <span>${rec}</span>
+        </div>`
+    ).join('');
+    
+    // 결과 표시
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('prediction-result').style.display = 'block';
+}
+
+function updateCostAnalysis(predictedPower) {
+    const dailyCost = predictedPower * 24 * 150;
+    const monthlyCost = dailyCost * 30;
+    const savingsToday = dailyCost * 0.15;
+    
+    document.getElementById('daily-cost').textContent = `₩${dailyCost.toLocaleString()}`;
+    document.getElementById('monthly-cost').textContent = `₩${monthlyCost.toLocaleString()}`;
+    document.getElementById('savings-today').textContent = `₩${Math.round(savingsToday).toLocaleString()}`;
+}
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    // 현재 시간 자동 설정
+    const now = new Date();
+    document.getElementById('hour').value = now.getHours();
+    
+    // 계절 자동 설정
+    const month = now.getMonth() + 1;
+    let season;
+    if (month >= 3 && month <= 5) season = 'spring';
+    else if (month >= 6 && month <= 8) season = 'summer';
+    else if (month >= 9 && month <= 11) season = 'autumn';
+    else season = 'winter';
+    
+    document.getElementById('season').value = season;
+    
+    // 평일/주말 자동 설정
+    const dayOfWeek = now.getDay();
+    document.getElementById('day_type').value = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend' : 'weekday';
+    
+    // 환영 메시지
+    setTimeout(() => {
+        showSmartAlert('스마트 전력 관리 시스템에 오신 것을 환영합니다! 건물을 선택하여 시작하세요.', 'info');
+    }, 1000);
+});
+</script>
+
+{% endblock %}
